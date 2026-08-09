@@ -303,9 +303,9 @@ The stabilized rate is mapped through a piecewise curve. Below 56% there is **no
 $$
 S_{\text{base}}(\hat{W}) =
 \begin{cases}
-0 & \hat{W} \le 0.56 \\[6pt]
-\dfrac{\hat{W} - 0.56}{0.06} \times 0.25 & 0.56 < \hat{W} \le 0.62 \\[6pt]
-0.25 + \dfrac{\hat{W} - 0.62}{0.08} \times 0.35 & 0.62 < \hat{W} \le 0.70 \\[6pt]
+0 & \hat{W} \le 0.56 \\\\[6pt]
+\dfrac{\hat{W} - 0.56}{0.06} \times 0.25 & 0.56 < \hat{W} \le 0.62 \\\\[6pt]
+0.25 + \dfrac{\hat{W} - 0.62}{0.08} \times 0.35 & 0.62 < \hat{W} \le 0.70 \\\\[6pt]
 \mathrm{clamp}\left(0.60 + \dfrac{\hat{W} - 0.70}{0.30} \times 0.25\right) & \hat{W} > 0.70
 \end{cases}
 $$
@@ -329,10 +329,10 @@ This is the part that makes the model *rank-aware*, and it's what separates it f
 It applies **only when both conditions hold**:
 
 - $R \ge 600$ — the account has actually climbed somewhere meaningful, **and**
-- $G < C$ — it got there in fewer matches than its division normally takes
+- $G \lt C$ — it got there in fewer matches than its division normally takes
 
 $$
-\text{deficit} = \mathrm{clamp}\!\left(\frac{C - G}{C}\right)
+\text{deficit} = \mathrm{clamp}\left(\frac{C - G}{C}\right)
 \qquad
 S_{\text{smurf}} = \text{deficit} \times \mathrm{clamp}(W/100)
 $$
@@ -341,7 +341,7 @@ The two factors multiply, which means **both** have to be true for the term to f
 
 The mode's final signal takes whichever term is more alarming:
 
-$$S = \mathrm{clamp}\big(\max(S_{\text{base}},\, S_{\text{smurf}})\big)$$
+$$S = \mathrm{clamp}\big(\max(S_{\text{base}}, S_{\text{smurf}})\big)$$
 
 > **Team Duels use a reduced cap of $0.7 \times C$** — team modes are played less often than solo Ranked, so demanding the same volume would over-flag ordinary players.
 
@@ -403,12 +403,12 @@ Classic games have no win rate, so anomaly is derived from **average score**, th
 $$
 S_{\text{score}} =
 \begin{cases}
-0 & A \le 18{,}000 \\[6pt]
-\dfrac{A - 18{,}000}{2{,}000} \times 0.6 & 18{,}000 < A \le 20{,}000 \\[6pt]
+0 & A \le 18{,}000 \\\\[6pt]
+\dfrac{A - 18{,}000}{2{,}000} \times 0.6 & 18{,}000 < A \le 20{,}000 \\\\[6pt]
 0.6 + \dfrac{A - 20{,}000}{5{,}000} \times 0.4 & A > 20{,}000
 \end{cases}
 \qquad
-E = \mathrm{clamp}\!\left(\sqrt{\frac{G}{1500}}\right)
+E = \mathrm{clamp}\left(\sqrt{\frac{G}{1500}}\right)
 $$
 
 $$S_{\text{classic}} = \mathrm{clamp}(S_{\text{score}} \times E)$$
