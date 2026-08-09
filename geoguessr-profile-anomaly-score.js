@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         GeoGuessr Profile Anomaly Score
-// @namespace    https://github.com/MagnusMagi/GeoGuessr-Profile-Anomaly-Score
-// @version      1.0.0
-// @description  Rank-aware smurf detection with auto-fetch and explicitly mapped math breakdown UI.
+// @namespace    https://example.local/geoguessr
+// @version      6.2.0
+// @description  Rank-aware smurf detection with auto-fetch, explicit math breakdown, and visible threshold caps.
 // @match        https://www.geoguessr.com/*
 // @license      MIT
 // @grant        none
@@ -42,7 +42,7 @@
         if (value == null) return null;
         const raw = String(value).replace(/\u00a0/g, " ").trim().replace(/[^\d,.\-]/g, "");
         if (!raw) return null;
-        
+
         const lastComma = raw.lastIndexOf(",");
         const lastDot = raw.lastIndexOf(".");
         let normalized = raw;
@@ -143,9 +143,9 @@
                 const statLabels = [...widget.querySelectorAll('span')];
                 for (const span of statLabels) {
                     const labelText = span.textContent.trim().toLowerCase();
-                    const valueEl = span.previousElementSibling; 
+                    const valueEl = span.previousElementSibling;
                     if (!valueEl) continue;
-                    
+
                     const num = parseLocaleNumber(valueEl.textContent);
                     if (num === null) continue;
 
@@ -172,7 +172,7 @@
         }
 
         let stats = extractProfileStats();
-        
+
         if (stats.rankedGames !== null || stats.teamGames !== null || stats.classicGames !== null) {
             hiddenStatsCache[currentPath] = stats;
             return stats;
@@ -200,7 +200,7 @@
                         const hasNumbers = Array.from(modal.querySelectorAll('[class*="stat-comparison-modal_cell"]')).some(c => /\d/.test(c.textContent));
                         if (hasNumbers || checks > 40) {
                             clearInterval(interval);
-                            setTimeout(resolve, 200); 
+                            setTimeout(resolve, 200);
                         }
                     } else if (checks > 40) {
                         clearInterval(interval);
@@ -234,29 +234,25 @@
     }
 
     // ==========================================
-    // 2. EXPLICIT MATH & RANK LOGIC
+    // 2. EXPLICIT MATH & RANK LOGIC (FAIR CAPS)
     // ==========================================
 
     function getRankContext(rating) {
-        let cap = 600;
+        let cap = 500;
         let name = "Unknown";
 
         if (rating == null) return { name, cap, rating: "?" };
 
-        if (rating < 400) { name = "Bronze"; cap = 50; }
-        else if (rating < 600) { name = "Silver"; cap = 100; }
-        else if (rating < 850) { name = "Gold"; cap = 250; }
-        else if (rating < 1100) { name = "Master"; cap = 500; }
-        else if (rating < 1200) { name = "Champion (1.1k)"; cap = 600; }
-        else if (rating < 1300) { name = "Champion (1.2k)"; cap = 800; }
-        else if (rating < 1400) { name = "Champion (1.3k)"; cap = 1000; }
-        else if (rating < 1500) { name = "Champion (1.4k)"; cap = 1200; }
-        else if (rating < 1600) { name = "Champion (1.5k)"; cap = 1500; }
-        else if (rating < 1700) { name = "Champion (1.6k)"; cap = 1800; }
-        else if (rating < 1800) { name = "Champion (1.7k)"; cap = 2200; }
-        else if (rating < 1900) { name = "Champion (1.8k)"; cap = 2600; }
-        else if (rating < 2000) { name = "Champion (1.9k)"; cap = 3000; }
-        else { name = "Champion (2k+)"; cap = 4000; }
+        if (rating < 400) { name = "Bronze"; cap = 30; }
+        else if (rating < 600) { name = "Silver"; cap = 80; }
+        else if (rating < 850) { name = "Gold"; cap = 200; }
+        else if (rating < 1100) { name = "Master"; cap = 350; }
+        else if (rating < 1200) { name = "Champion (1.1k)"; cap = 500; }
+        else if (rating < 1300) { name = "Champion (1.2k)"; cap = 700; }
+        else if (rating < 1500) { name = "Champion (1.3k-1.4k)"; cap = 900; }
+        else if (rating < 1700) { name = "Champion (1.5k-1.6k)"; cap = 1200; }
+        else if (rating < 1900) { name = "Champion (1.7k-1.8k)"; cap = 1600; }
+        else { name = "Champion (1.9k+)"; cap = 2500; }
 
         return { name, cap, rating };
     }
@@ -280,10 +276,10 @@
 
     function rankAnomalySignalDetailed(games, winRate, rating, expectedCap) {
         if (!isUsableNumber(games) || !isUsableNumber(winRate) || games <= 0) return null;
-        
+
         const stabRate = stabilizedWinRate(games, winRate);
         const baseSignal = winRateSignal(stabRate);
-        
+
         let smurfBoost = 0;
         let calcText = "";
 
@@ -335,23 +331,23 @@
                 </div>
             `;
         }
-        
+
         return { value: clamp(Math.max(baseSignal, smurfBoost)), calcText };
     }
 
     function classicSignalDetailed(games, averageScore) {
         if (!isUsableNumber(games) || !isUsableNumber(averageScore) || games <= 0) return null;
         let scoreSignal = 0;
-        
+
         if (averageScore > 20000) {
             scoreSignal = 0.6 + ((averageScore - 20000) / 5000) * 0.4;
         } else if (averageScore > 18000) {
             scoreSignal = ((averageScore - 18000) / 2000) * 0.6;
         }
-        
+
         const evidence = clamp(Math.sqrt(games / 1500));
         const val = clamp(scoreSignal * evidence);
-        
+
         const scoreStr = (scoreSignal * 100).toFixed(1);
         const evStr = evidence.toFixed(2);
         const finalStr = (val * 100).toFixed(1);
@@ -370,7 +366,7 @@
                 <span>${scoreStr}% * ${evStr} = ${finalStr}%</span>
             </div>
         `;
-        
+
         return { value: val, calcText };
     }
 
@@ -387,7 +383,7 @@
 
         const rankedDet = rankAnomalySignalDetailed(stats.rankedGames, stats.rankedWinRate, stats.rating, rankCtx.cap);
         const classicDet = classicSignalDetailed(stats.classicGames, stats.classicAverageScore);
-        const teamDet = rankAnomalySignalDetailed(stats.teamGames, stats.teamWinRate, stats.rating, rankCtx.cap * 0.7);
+        const teamDet = rankAnomalySignalDetailed(stats.teamGames, stats.teamWinRate, stats.rating, rankCtx.cap * 0.7); // Team cap is slightly more forgiving
 
         const signals = [];
         if (rankedDet) signals.push({ name: "Ranked", weight: 0.5, value: rankedDet.value, rawDesc: `${formatNum(stats.rankedGames)} matches, ${stats.rankedWinRate}% win rate`, calcText: rankedDet.calcText });
@@ -454,7 +450,7 @@
             #${CONFIG.panelId} .geo-close { background: none; border: none; color: #cbd5e1; cursor: pointer; font-size: 18px; line-height: 1; padding: 0; }
             #${CONFIG.panelId} .geo-close:hover { color: #ff4b4b; }
             #${CONFIG.panelId} .geo-content { padding: 14px; max-height: 80vh; overflow-y: auto; }
-            
+
             /* Rank Context Box */
             #${CONFIG.panelId} .geo-rank-context {
                 display: flex;
@@ -476,7 +472,7 @@
             #${CONFIG.panelId} .geo-subtitle { color: #888; font-size: 10px; text-transform: uppercase; }
             #${CONFIG.panelId} .geo-badge { padding: 4px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; }
             #${CONFIG.panelId} .geo-note { color: #cbd5e1; margin-top: 12px; font-size: 11px; }
-            
+
             /* Divider and Explanation Elements */
             #${CONFIG.panelId} .geo-divider { border-top: 1px solid rgba(255, 255, 255, 0.15); margin: 12px 0; }
             #${CONFIG.panelId} .geo-explanation { font-size: 11px; color: #a1a1aa; line-height: 1.45; }
@@ -485,7 +481,7 @@
             #${CONFIG.panelId} .geo-explanation li { margin-bottom: 8px; padding-left: 8px; border-left: 2px solid rgba(255, 255, 255, 0.15); }
             #${CONFIG.panelId} .geo-explanation li b { color: #e4e4e7; font-weight: 600; }
             #${CONFIG.panelId} .geo-raw-data { margin-top: 3px; font-size: 10.5px; color: #8f8f97; font-family: monospace; }
-            
+
             /* Explicit Math Breakdown Styles */
             #${CONFIG.panelId} .geo-math-container { margin-top: 5px; background: rgba(0, 0, 0, 0.25); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 6px; padding: 6px 8px; }
             #${CONFIG.panelId} .geo-math-row { margin-bottom: 7px; font-size: 10.5px; color: #a1a1aa; }
@@ -494,6 +490,9 @@
             #${CONFIG.panelId} .geo-math-row-formula { display: block; font-family: monospace; color: #a3e635; background: rgba(0,0,0,0.3); padding: 3px 6px; border-radius: 4px; word-break: break-word; }
             #${CONFIG.panelId} .geo-math-final { border-top: 1px dashed rgba(255, 255, 255, 0.15); padding-top: 6px; margin-top: 8px; font-weight: 700; color: #38bdf8; display: flex; justify-content: space-between; align-items: center; }
             #${CONFIG.panelId} .geo-math-final span:last-child { font-family: monospace; font-size: 12px; }
+
+            /* Threshold List */
+            #${CONFIG.panelId} .geo-cap-list { font-family: monospace; color: #8f8f97; background: rgba(0,0,0,0.25); padding: 6px; border-radius: 4px; margin-top: 6px; line-height: 1.5; font-size: 10px; }
 
             #${CONFIG.panelId} .low { background: #14532d; color: #bbf7d0; }
             #${CONFIG.panelId} .limited { background: #713f12; color: #fde68a; }
@@ -526,7 +525,7 @@
                 background: rgba(40, 40, 40, 0.95) !important;
                 transform: translateX(-3px);
             }
-            
+
             /* Custom Scrollbar */
             #${CONFIG.panelId} .geo-content::-webkit-scrollbar { width: 6px; }
             #${CONFIG.panelId} .geo-content::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.05); border-radius: 4px; }
@@ -543,7 +542,7 @@
         header.addEventListener('mousedown', (e) => {
             if (e.target.closest('.geo-close')) return;
             isDragging = true;
-            
+
             const rect = panel.getBoundingClientRect();
             startX = e.clientX;
             startY = e.clientY;
@@ -586,7 +585,7 @@
         const toggleBtn = document.createElement("button");
         toggleBtn.id = CONFIG.toggleId;
         toggleBtn.innerHTML = `<span style="color:#ff4b4b;">📊</span> Analyze`;
-        
+
         toggleBtn.onclick = () => {
             isPanelManuallyClosed = false;
             toggleBtn.remove();
@@ -599,7 +598,7 @@
     function updatePanelContent(result) {
         injectStyles();
         let panel = document.getElementById(CONFIG.panelId);
-        
+
         if (!panel) {
             panel = document.createElement("aside");
             panel.id = CONFIG.panelId;
@@ -631,7 +630,7 @@
         } else {
             let explanationHtml = "";
             let rankHtml = "";
-            
+
             let formulaHtml = `
                 <div class="geo-divider"></div>
                 <div class="geo-explanation">
@@ -642,9 +641,17 @@
                         <li><b>Smurf Boost:</b> Multiplies the score if the player reached a high division with suspiciously few matches.</li>
                         <li><b>Weights:</b> Ranked (50%), Classic (30%), Team (20%).</li>
                     </ul>
+
+                    <div class="geo-divider"></div>
+                    <strong>Expected Match Thresholds (Caps):</strong>
+                    <div class="geo-cap-list">
+                        Bronze: 30 | Silver: 80 | Gold: 200 | Master: 350<br>
+                        Champ 1.1k: 500 | 1.2k: 700 | 1.4k: 900<br>
+                        Champ 1.6k: 1200 | 1.8k: 1600 | 1.9k+: 2500
+                    </div>
                 </div>
             `;
-            
+
             let personalMathHtml = "";
 
             if (result.rankCtx && result.rankCtx.rating) {
@@ -659,7 +666,7 @@
                     </div>
                 `;
             }
-            
+
             if (result.signals && result.signals.length > 0 && result.totalWeight > 0) {
                 const listItems = result.signals.map(s => {
                     const impact = Math.round((s.weight / result.totalWeight) * 100);
@@ -671,7 +678,7 @@
                         </li>
                     `;
                 }).join("");
-                
+
                 explanationHtml = `
                     <div class="geo-divider"></div>
                     <div class="geo-explanation">
@@ -683,7 +690,6 @@
                     </div>
                 `;
 
-                // Render specific formula breakdown
                 const mathListItems = result.signals.map(s => {
                     return `
                         <div style="margin-bottom: 12px;">
@@ -753,7 +759,7 @@
             hasAttemptedAutoFetch = false;
             removeUI();
         }
-        
+
         clearTimeout(debounceTimer);
         debounceTimer = setTimeout(analyzeProfile, CONFIG.debounceMs);
     }
@@ -785,7 +791,7 @@
             renderToggleButton();
         }
     });
-    
+
     observer.observe(document.documentElement, { childList: true, subtree: true });
 
     scheduleAnalysis();
