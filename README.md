@@ -4,16 +4,17 @@
 
 **Rank-aware smurf detection for GeoGuessr profiles — with an explicitly mapped math breakdown and visible threshold caps.**
 
-A zero-dependency userscript that reads a public GeoGuessr profile, stabilizes its win rates against small-sample noise, compares match volume to what the player's division actually demands, and renders a transparent, step-by-step derivation of every number it shows you — including the full threshold table it judged against.
+A zero-dependency userscript that reads a public GeoGuessr profile, stabilizes its win rates against small-sample noise, compares match volume to what the player's division actually demands, and renders a transparent, step-by-step derivation of every number it shows you — including the full threshold table it judged against. Available in English, Turkish, Estonian, French and German.
 
 [![Userscript](https://img.shields.io/badge/type-userscript-8b5cf6?style=for-the-badge&logo=javascript&logoColor=white)](geoguessr-profile-anomaly-score.js)
-[![Version](https://img.shields.io/badge/version-6.2.0-38bdf8?style=for-the-badge)](#-changelog)
+[![Version](https://img.shields.io/badge/version-6.4.0-38bdf8?style=for-the-badge)](#-changelog)
 [![License](https://img.shields.io/badge/license-MIT-a3e635?style=for-the-badge)](LICENSE)
+[![Languages](https://img.shields.io/badge/languages-5-8b5cf6?style=for-the-badge)](#-languages)
 [![Dependencies](https://img.shields.io/badge/dependencies-0-14532d?style=for-the-badge)](#design-principles)
 [![Grants](https://img.shields.io/badge/%40grant-none-71717a?style=for-the-badge)](#-privacy--permissions)
-[![Lines](https://img.shields.io/badge/lines-799-27272a?style=for-the-badge)](geoguessr-profile-anomaly-score.js)
+[![Lines](https://img.shields.io/badge/lines-1215-27272a?style=for-the-badge)](geoguessr-profile-anomaly-score.js)
 
-[Install](#-installation) · [How it works](#-how-it-works) · [The math](#-the-math-in-full) · [Thresholds](#-division--threshold-reference) · [FAQ](#-faq)
+[Install](#-installation) · [How it works](#-how-it-works) · [The math](#-the-math-in-full) · [Thresholds](#-division--threshold-reference) · [Languages](#-languages) · [FAQ](#-faq)
 
 </div>
 
@@ -39,6 +40,7 @@ A zero-dependency userscript that reads a public GeoGuessr profile, stabilizes i
   - [4. The classic signal](#4-the-classic-signal)
   - [5. Aggregation](#5-aggregation)
 - [Division & threshold reference](#-division--threshold-reference)
+- [Languages](#-languages)
 - [Reading the panel](#-reading-the-panel)
 - [Configuration](#-configuration)
 - [Architecture](#-architecture)
@@ -133,6 +135,20 @@ GeoGuessr is a client-routed app. The script patches `pushState`/`replaceState`,
 <tr>
 <td width="50%" valign="top">
 
+### 🌐 Five languages
+**New in 6.4.0.** The entire panel — including every line of the math derivation — speaks English, Turkish, Estonian, French and German. Auto-detected, with a picker in the header.
+
+</td>
+<td width="50%" valign="top">
+
+### 🔎 Language-agnostic stat fetching
+The **Show stats** button is found by GeoGuessr's own component classes plus the `stat` root that every supported language shares, so auto-fetch works whatever locale the site is rendering in.
+
+</td>
+</tr>
+<tr>
+<td width="50%" valign="top">
+
 ### 🖱️ Draggable, dismissible panel
 Grab the header and move it anywhere. Close it and it collapses into a slim edge tab; click **📊 Analyze** to bring it back. Your dismissal is respected until you change pages.
 
@@ -140,7 +156,7 @@ Grab the header and move it anywhere. Close it and it collapses into a slim edge
 <td width="50%" valign="top">
 
 ### ⚡ Zero dependencies, zero network
-No libraries, no bundler, no build step, no `@grant`, no external requests, no telemetry. One file, 799 lines, MIT.
+No libraries, no bundler, no build step, no `@grant`, no external requests, no telemetry. One file, 1,215 lines, MIT.
 
 </td>
 </tr>
@@ -180,7 +196,7 @@ https://raw.githubusercontent.com/MagnusMagi/GeoGuessr-Profile-Anomaly-Score/mai
 Navigate to any GeoGuessr profile — e.g. `https://www.geoguessr.com/user/<id>` — and the panel should appear top-right within about half a second.
 
 > [!WARNING]
-> **Upgrading from 1.0.0?** The `@namespace` changed between releases, and userscript managers key script identity on `@namespace` + `@name`. Installing 6.2.0 will create a **second, duplicate script** rather than updating the old one — leaving two panels fighting for the same corner. Delete the 1.0.0 entry from your manager's dashboard first.
+> **Upgrading from an older release?** Userscript managers key script identity on `@namespace` + `@name`, and the `@namespace` has changed twice: 1.0.0 used the repository URL, 6.2.0–6.3.0 used a `https://example.local/…` placeholder, and 6.4.0 points back at the script file in this repository. Installing 6.4.0 on top of a 6.2.0/6.3.0 install therefore creates a **second, duplicate script** instead of updating it — leaving two panels fighting for the same corner. Delete the old entry from your manager's dashboard first. Upgrades from 1.0.0, and everything from 6.4.0 onward, update cleanly.
 
 <details>
 <summary><b>Userscript header reference</b></summary>
@@ -188,9 +204,9 @@ Navigate to any GeoGuessr profile — e.g. `https://www.geoguessr.com/user/<id>`
 ```js
 // ==UserScript==
 // @name         GeoGuessr Profile Anomaly Score
-// @namespace    https://example.local/geoguessr
-// @version      6.2.0
-// @description  Rank-aware smurf detection with auto-fetch, explicit math breakdown, and visible threshold caps.
+// @namespace    https://github.com/MagnusMagi/GeoGuessr-Profile-Anomaly-Score/blob/main/geoguessr-profile-anomaly-score.js
+// @version      6.4.0
+// @description  Rank-aware smurf detection with auto-fetch, explicit math breakdown, and visible threshold caps. Available in English, Turkish, Estonian, French and German.
 // @match        https://www.geoguessr.com/*
 // @license      MIT
 // @grant        none
@@ -461,7 +477,7 @@ Because the denominator only sums the weights present, a profile with Ranked dat
 | 1700 – 1899 | Champion (1.7k–1.8k) | 1,600 | 1,120 |
 | ≥ 1900 | Champion (1.9k+) | 2,500 | 1,750 |
 
-If rating cannot be read at all, the context falls back to `{ name: "Unknown", cap: 500 }`.
+If rating cannot be read at all, the context falls back to `{ name: "Unknown", cap: 600 }`.
 
 > [!NOTE]
 > **The smurf term never fires below rating 600.** Bronze and Silver accounts are exempt by design — a low-rated account with few games is just a new player, not a smurf.
@@ -489,11 +505,88 @@ The tradeoff is real and worth naming: **a genuine smurf sitting between the old
 
 ---
 
+## 🌐 Languages
+
+The panel ships in five languages. Every user-facing string is translated, including the per-mode math derivation — there is no half-localized state where the headline is translated but the reasoning underneath is still English.
+
+| Code | Language | Number format | Notes |
+|---|---|---|---|
+| `en` | English | `19,500` | Source language |
+| `tr` | Türkçe | `19.500` | Percent written as `%84`, per Turkish convention |
+| `et` | Eesti | `19 500` | Also selected by `ee`, see below |
+| `fr` | Français | `19 500` | Narrow space before `:` and `%`, per French typography |
+| `de` | Deutsch | `19.500` | Space before `%`, per German typography |
+
+Numbers are formatted with `toLocaleString` in the active locale, so thousands separators follow the reader's convention rather than always being English commas.
+
+### How the language is chosen
+
+1. **GeoGuessr's own interface language**, read from `<html lang>`.
+2. **Your browser's preference list**, `navigator.languages`, taking the first supported entry.
+3. **English**, if nothing matches.
+
+Region subtags are ignored, so `de-DE`, `fr_CA` and `et-EE` all resolve correctly.
+
+> [!NOTE]
+> `EE` is the *country* code for Estonia; the *language* code is `et`. Both are accepted and map to Estonian, because they get used interchangeably in practice.
+
+### Changing it
+
+The panel header has a picker listing each language in its own name — `English`, `Türkçe`, `Eesti`, `Français`, `Deutsch`. Switching is instant and **re-reads nothing from the page**: the last extracted stats are kept in memory and the whole panel is simply re-derived, so the score cannot change when the language does.
+
+The choice lasts for the session. It is deliberately **not** written to `localStorage`, which keeps the "no persistent storage" guarantee in [Privacy & permissions](#-privacy--permissions) literally true. Auto-detection means most users never need to touch the picker anyway.
+
+### What is *not* translated
+
+- **Division names** — `Bronze`, `Gold`, `Champion (1.9k+)` and so on are GeoGuessr's own badge names, kept as-is so they match the badge rendered on the profile. Only the `Unknown` fallback is localized.
+- **The formulas themselves** — `(60 * 84.0% + 50 * 50%) / (60 + 50) = 68.5%` is arithmetic and reads the same everywhere. Only the *labels* around it are translated.
+
+### Finding the "Show stats" button in any locale
+
+Auto-fetch has to click GeoGuessr's own button, whose label is in **GeoGuessr's** interface language — not the panel's. That button is:
+
+```html
+<button class="button_button__HASH button_variantTertiary__HASH button_sizeSmall__HASH">
+  <div class="button_wrapper__HASH">
+    <span class="button_label__HASH">Show stats</span>
+  </div>
+</button>
+```
+
+Matching is two-layered, because neither layer is sufficient alone:
+
+- **Structure** — `button[class*="button_button__"]`, reading the label from `[class*="button_label__"]`. Only the stable CSS-module prefixes are used, so a new deploy that rehashes the class names doesn't break it. But structure alone is ambiguous: *Follow*, *Challenge* and *Report* are the same tertiary small button.
+- **The `stat` root** — which every supported language happens to share:
+
+| Language | Label | Contains |
+|---|---|---|
+| English | Show **stat**s | ✅ |
+| Türkçe | i̇**stat**istikleri göster | ✅ |
+| Eesti | Näita **stat**istikat | ✅ |
+| Français | Afficher les **stat**istiques | ✅ |
+| Deutsch | **Stat**istiken anzeigen | ✅ |
+
+So the exact wording never has to be right — only the root. The full labels are still listed in the source for precision and documentation. Polish, Dutch, Swedish, Italian and Portuguese match for free as a side effect; Spanish (*Estadísticas*) does not, since it uses a `stad` root.
+
+If the component classes ever disappear entirely, the finder falls back to scanning every `<button>` on the page.
+
+### Adding a language
+
+1. Add an entry to `LANGUAGES` with its `code`, native `label` and `numberLocale`.
+2. Add a matching block to `STRINGS` — copy the `en` block and translate the values, keeping every `{placeholder}` exactly as it appears in the English source.
+3. If the language's word for "statistics" does not contain `stat`, add its **Show stats** label to `SHOW_STATS_LABELS`.
+
+Missing keys fall back to English rather than rendering blank, so a partial translation degrades gracefully.
+
+> Translations were produced by the author, not by native speakers of every language. Corrections are very welcome — especially for Estonian, and for any term that should match GeoGuessr's own in-game wording.
+
+---
+
 ## 🖼️ Reading the panel
 
 ```
 ┌────────────────────────────────────────────┐
-│ 📊 Profile Analysis                      × │  ← drag here to move
+│ 📊 Profile Analysis        [English ▾]   × │  ← drag here to move
 ├────────────────────────────────────────────┤
 │  🏆  Champion (1.9k+) (1950)               │  ← rank context
 │      Expected matches: ~2500               │
@@ -529,6 +622,12 @@ The tradeoff is real and worth naming: **a genuine smurf sitting between the old
 │     (2500-60)/2500 * 84.0%         82.0%   │
 │     ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─   │
 │     Applied Signal: Max(53.6%,82.0%)=82.0% │
+│                                            │
+│   Final Weighted Score:                    │
+│     Calculation: (82.0% * 71%)             │
+│                + (65.5% * 29%)             │
+│     ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─   │
+│     Total Score:                     77.3% │
 └────────────────────────────────────────────┘
 ```
 
@@ -542,6 +641,7 @@ The tradeoff is real and worth naming: **a genuine smurf sitting between the old
 | **↳ raw data** | The exact source numbers, so you can sanity-check the extraction |
 | **Expected Match Thresholds** | The complete cap table, so you can audit the calibration in place |
 | **Personal Math Breakdown** | The full substituted arithmetic for this specific profile |
+| **Final Weighted Score** | The weighted sum itself, `(anomaly × impact) + …`, closing the loop from per-mode signals to the headline |
 
 > The in-panel cap list uses shorthand labels (`1.4k`, `1.6k`, `1.8k`) for the merged tiers that `getRankContext()` names `Champion (1.3k-1.4k)`, `(1.5k-1.6k)` and `(1.7k-1.8k)`. The numbers are identical — only the labels are abbreviated to fit.
 
@@ -550,6 +650,7 @@ The tradeoff is real and worth naming: **a genuine smurf sitting between the old
 | Action | Result |
 |---|---|
 | Drag the header | Repositions the panel (switches to absolute `left`/`top`) |
+| Pick a language | Re-derives the whole panel from the stats already in memory; nothing is re-read and the score cannot change |
 | Click **×** | Panel closes; the **📊 Analyze** edge tab appears on the right |
 | Click **📊 Analyze** | Re-runs analysis and restores the panel |
 | Navigate to another profile | Dismissal state resets; analysis re-runs automatically |
@@ -590,6 +691,8 @@ const CONFIG = {
 | Classic evidence ceiling | `classicSignalDetailed()` | `√(games / 1500)` |
 | Mode weights | `calculateAnomalyScore()` | `0.5 / 0.3 / 0.2` |
 | Band thresholds | `getScoreBand()` | `20 / 45 / 70` |
+| Default language | `FALLBACK_LANG` | `"en"` |
+| Available languages | `LANGUAGES` / `STRINGS` | `en, tr, et, fr, de` |
 
 > [!TIP]
 > If you edit `getRankContext()`, remember to update the hard-coded cap list in the **"Expected Match Thresholds"** block inside `updatePanelContent()` — the panel text is a literal string, not generated from the function, so the two can silently drift apart.
@@ -601,7 +704,15 @@ const CONFIG = {
 Single file, four clearly separated layers, no build step:
 
 ```
-geoguessr-profile-anomaly-score.js  (799 lines)
+geoguessr-profile-anomaly-score.js  (1,215 lines)
+│
+├── 0. LOCALISATION                                          [new in 6.4.0]
+│   ├── LANGUAGES / STRINGS        → 5 locales × 50 keys
+│   ├── normalizeLang()            → strips region subtags, aliases ee → et
+│   ├── detectLanguage()           → <html lang> → navigator.languages → en
+│   ├── t(key, params)             → lookup + {placeholder} interpolation, en fallback
+│   ├── formatNumber()             → toLocaleString in the active locale
+│   └── findShowStatsButton()      → component classes + shared "stat" root
 │
 ├── 1. DATA PARSING & EXTRACTION
 │   ├── isProfilePage()            → gate on /user/*
@@ -619,10 +730,10 @@ geoguessr-profile-anomaly-score.js  (799 lines)
 │   └── calculateAnomalyScore()    → weighted aggregation
 │
 ├── 3. UI & DRAG MECHANICS
-│   ├── injectStyles()             → scoped stylesheet, id-namespaced (+ .geo-cap-list)
-│   ├── makeDraggable()            → pointer-based header drag
+│   ├── injectStyles()             → scoped stylesheet, id-namespaced (+ .geo-cap-list, .geo-lang)
+│   ├── makeDraggable()            → pointer-based header drag (ignores the picker)
 │   ├── renderToggleButton()       → collapsed edge tab
-│   ├── updatePanelContent()       → idempotent render + threshold table block
+│   ├── updatePanelContent()       → idempotent render + threshold table + language picker
 │   └── removeUI()                 → teardown
 │
 └── 4. ROUTER & OBSERVER
@@ -636,6 +747,7 @@ geoguessr-profile-anomaly-score.js  (799 lines)
 
 - **Zero dependencies.** No frameworks, no bundler, no `@grant`, no CDN. Auditable end to end in one sitting.
 - **Transparent by construction.** Every signal function returns `{ value, calcText }` — the number *and* the HTML explaining it. The UI can't display a figure the model didn't derive.
+- **Localized to the last line.** The math derivation is translated alongside the headline. A panel that explains itself only in English is not explaining itself to everyone.
 - **Auditable calibration.** Since 6.2.0 the thresholds aren't just documented, they're *printed in the product*. A model that judges people should show its rulebook.
 - **Defensive extraction.** GeoGuessr's class names are hashed and change between deploys, so all selectors use `[class*="..."]` substring matching with layered fallbacks.
 - **Idempotent rendering.** The panel is created once and its content container refilled, so drag position and scroll survive re-analysis.
@@ -649,7 +761,8 @@ geoguessr-profile-anomaly-score.js  (799 lines)
 |---|---|
 | Network requests | **None.** No `@grant`, no `GM_xmlhttpRequest`, no `fetch`, no `XMLHttpRequest`. |
 | Data leaving your browser | **None.** Nothing is transmitted anywhere, ever. |
-| Persistent storage | **None.** The stats cache is an in-memory object; it dies with the tab. |
+| Persistent storage | **None.** The stats cache and the language choice are in-memory only; both die with the tab. No `localStorage`, no cookies. |
+| Language detection | Reads `<html lang>` and `navigator.languages` locally. Neither is sent anywhere. |
 | Data sources | Only what is already rendered on the public profile page you are viewing. |
 | Accounts touched | Only the profile you have deliberately opened. No crawling, no enumeration. |
 | Automation | One programmatic click on GeoGuessr's own **"Show stats"** button — the same action you'd perform by hand. |
@@ -677,7 +790,6 @@ The script is a **local read-only analyzer**. It cannot see private profiles, ca
 - **The panel's cap list is hard-coded.** It's a literal string in `updatePanelContent()`, not derived from `getRankContext()`. Editing one without the other makes the displayed table lie about the model.
 - **Team caps show floating-point artifacts.** `cap * 0.7` is computed in binary floating point, so the Master and Champion 1.2k tiers produce `244.99999999999997` and `489.99999999999994`. Those raw values are interpolated straight into the Team mode's *Smurf Multiplier* formula text, so affected profiles display an 18-digit number in the breakdown. Cosmetic only — the arithmetic is unaffected. A `Math.round()` at the call site fixes it.
 - **`hasAttemptedAutoFetch` is assigned but never declared** (line 759, still present in 6.2.0). Under `"use strict"` this throws a `ReferenceError` on the first analysis of each new path, which skips the `removeUI()` call on the same tick — a stale panel can briefly persist across profiles. See [Contributing](#-contributing); this is a good first fix.
-- **`@namespace` points at `https://example.local/geoguessr`**, a placeholder rather than the project URL. It works, but it breaks the upgrade path from 1.0.0 (see the [install warning](#step-3--verify)) and is worth pointing back at the repository.
 
 ---
 
@@ -780,6 +892,20 @@ Yes, on your own profile page. Note that the modal extractor reads the **"other"
 </details>
 
 <details>
+<summary><b>Can I change the panel's language?</b></summary>
+
+Yes — there's a picker in the panel header, and the language is auto-detected from GeoGuessr and your browser to begin with. See [Languages](#-languages). The choice lasts for the session; it is not stored, so the script keeps its no-storage guarantee.
+
+</details>
+
+<details>
+<summary><b>Does changing the language change the score?</b></summary>
+
+No. Switching re-derives the panel from the same numbers already in memory — nothing is re-read from the page, and the score is identical in all five languages. Only the labels around the arithmetic change; the arithmetic itself is printed the same way everywhere.
+
+</details>
+
+<details>
 <summary><b>Does it work on mobile browsers?</b></summary>
 
 The analysis works anywhere a userscript manager runs, but **dragging is mouse-only** — there's no touch handling yet.
@@ -804,12 +930,24 @@ Ranked Duels are the most controlled signal available: fixed format, matchmade o
 
 ## 📌 Changelog
 
+### 6.4.0 — *Five languages*
+
+- **The panel is now available in English, Turkish, Estonian, French and German** — 50 strings per locale, covering the full math derivation, not just the headline.
+- **Automatic language detection** from `<html lang>`, then `navigator.languages`, then English. Region subtags are stripped and `ee` is aliased to `et`.
+- **Language picker in the panel header**, listing each language in its own name. Switching re-derives the panel from the stats already in memory — nothing is re-read and the score cannot move.
+- **Locale-aware number formatting** via `toLocaleString`, so thousands separators follow the reader's convention.
+- **`Show stats` is now found in any interface language** — GeoGuessr's component classes plus the `stat` root shared by every supported language, replacing the previous English/Turkish-only literal match. Falls back to a full `<button>` scan if the class naming changes.
+- Badge row wraps instead of overflowing when translated labels run long; the picker is excluded from the header's drag handler.
+- **New: a `Final Weighted Score` box** closing the math breakdown, showing the weighted sum `(anomaly × impact) + …` that produces the headline. Localized alongside everything else.
+- `@namespace` now points at the script file in this repository instead of the previous placeholder.
+- Fallback cap for an unreadable rating restored to `600`.
+
 ### 6.2.0 — *Fair Caps*
 
 - **Recalibrated every division cap downward by 30–40%** to cut false positives on efficient climbers ([full comparison](#what-the-620-recalibration-changed)).
 - **Consolidated the ladder from 14 tiers to 10** — the nine separate Champion bands became five (`1.1k`, `1.2k`, `1.3k–1.4k`, `1.5k–1.6k`, `1.9k+`).
 - **New: "Expected Match Thresholds (Caps)" panel block** — the complete cap table is now printed in the UI, backed by a new `.geo-cap-list` style.
-- Fallback cap for unreadable ratings lowered from `600` to `500`.
+- Fallback cap for unreadable ratings lowered from `600` to `500` (restored to `600` in 6.4.0).
 - Section 2 renamed *Explicit Math & Rank Logic (Fair Caps)*; trailing-whitespace and comment cleanup throughout.
 - `@description` updated to mention the visible threshold caps; `@namespace` changed (see the [upgrade warning](#step-3--verify)).
 
@@ -827,14 +965,16 @@ Ranked Duels are the most controlled signal available: fixed format, matchmade o
 - [ ] Fix the undeclared `hasAttemptedAutoFetch` assignment
 - [ ] Round the Team cap so the breakdown stops printing `489.99999999999994`
 - [ ] Generate the in-panel cap list from `getRankContext()` instead of a hard-coded string
-- [ ] Point `@namespace` back at the repository URL
+- [x] ~~Point `@namespace` back at the repository URL~~ — fixed in 6.4.0
 - [ ] Touch/pointer support for dragging on mobile
 - [ ] Persist panel position and dismissal state across sessions
 - [ ] Calibrate division caps against real population data instead of priors
 - [ ] Copy-to-clipboard export of the full math breakdown
 - [ ] Light-theme variant of the panel
 - [ ] Configurable weights and thresholds via an in-panel settings pane
-- [ ] Full i18n for panel copy (Turkish detection already exists in auto-fetch)
+- [x] ~~Full i18n for panel copy~~ — shipped in 6.3.0 (en, tr, et, fr, de)
+- [ ] Native-speaker review of the Estonian, French and German translations
+- [ ] More languages — the `STRINGS` table takes one block per locale
 
 ---
 
@@ -859,6 +999,7 @@ node --check geoguessr-profile-anomaly-score.js   # syntax gate — no build ste
 - **Keep it dependency-free.** No libraries, no build step.
 - **Keep the math explicit.** Any new signal must return `{ value, calcText }`, with `calcText` showing real substituted numbers — never a bare figure.
 - **Keep the displayed thresholds honest.** If you change `getRankContext()`, update the panel's cap list in the same commit (or, better, generate it).
+- **Keep the locales in sync.** A new user-facing string means a new key in all five `STRINGS` blocks, with identical `{placeholder}` names. Missing keys fall back to English, so drift is silent — check it deliberately.
 - **Prefer substring selectors.** Use `[class*="..."]` over exact hashed class names, and always add a fallback path.
 - **Bump `@version`** in the userscript header with every behavioral change.
 - **Document threshold changes** in the PR description, with the reasoning behind the new values.

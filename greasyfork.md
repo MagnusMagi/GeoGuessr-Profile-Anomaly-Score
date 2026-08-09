@@ -24,15 +24,17 @@
 <center>
 <h1>📊 GeoGuessr Profile Anomaly Score</h1>
 <p><b>Rank-aware smurf detection with an explicitly mapped math breakdown and visible threshold caps.</b></p>
+<p><b>English · Türkçe · Eesti · Français · Deutsch</b></p>
 <p>
-<img src="https://img.shields.io/badge/version-6.2.0-38bdf8" alt="Version 6.2.0" height="20">
+<img src="https://img.shields.io/badge/version-6.4.0-38bdf8" alt="Version 6.4.0" height="20">
 <img src="https://img.shields.io/badge/license-MIT-a3e635" alt="MIT license" height="20">
+<img src="https://img.shields.io/badge/languages-5-8b5cf6" alt="Five languages" height="20">
 <img src="https://img.shields.io/badge/dependencies-0-14532d" alt="Zero dependencies" height="20">
 <img src="https://img.shields.io/badge/network%20requests-none-71717a" alt="No network requests" height="20">
 </p>
 </center>
 
-Open any GeoGuessr profile and this script reads the public stats already on the page, corrects the win rates for sample size, compares match volume against what the player's division actually demands, and shows you a score from 0 to 100 — together with **every step of the arithmetic that produced it**.
+Open any GeoGuessr profile and this script reads the public stats already on the page, corrects the win rates for sample size, compares match volume against what the player's division actually demands, and shows you a score from 0 to 100 — together with **every step of the arithmetic that produced it**, in your language.
 
 <div style="border: 1px solid #e0b000; background-color: #fff8e1; color: #4a3a00">
 <p><b>⚠️ This is an anomaly indicator, not a cheat verdict.</b></p>
@@ -57,6 +59,7 @@ Each number is meaningless alone. Win rate needs sample-size correction, match c
 
 ## What it does
 
+- **Five languages.** English, Turkish, Estonian, French and German — the whole panel, including every line of the math derivation. Auto-detected from GeoGuessr and your browser, with a picker in the header.
 - **Explicit math breakdown.** Every signal prints its own derivation chain — stabilized win rate, risk curve, smurf multiplier, applied signal — with the real numbers substituted in. No hidden weights.
 - **Visible threshold caps.** The panel prints the complete expected-match table, so you can audit the calibration instead of trusting it.
 - **Rank-aware thresholds.** A 10-tier division ladder maps each rating band to an expected match count. 80 games at Silver is unremarkable; 80 games at Champion 1.9k+ is a five-alarm signal.
@@ -65,6 +68,28 @@ Each number is meaningless alone. Win rate needs sample-size correction, match c
 - **Locale-proof parsing.** `1.234,5` and `1,234.5` both parse correctly; the decimal separator is inferred from position, not assumed.
 - **Draggable, dismissible panel.** Grab the header to move it. Close it and it collapses to a slim edge tab; click "📊 Analyze" to bring it back.
 - **Zero dependencies, zero network.** No libraries, no `@grant`, no external requests, no telemetry, no storage.
+
+---
+
+## Languages
+
+Every user-facing string is translated, including the per-mode math derivation — there is no half-localized state where the headline is translated but the reasoning underneath is still English.
+
+| Code | Language | Number format |
+|---|---|---|
+| `en` | English | 19,500 |
+| `tr` | Türkçe | 19.500 |
+| `et` | Eesti | 19 500 |
+| `fr` | Français | 19 500 |
+| `de` | Deutsch | 19.500 |
+
+The language is chosen automatically: GeoGuessr's own interface language first, then your browser's preference list, then English. Region subtags are ignored, so `de-DE`, `fr_CA` and `et-EE` all work. `EE` is the country code for Estonia while `et` is the language code — both are accepted.
+
+You can override it with the picker in the panel header. Switching is instant and **re-reads nothing from the page**: the last extracted stats stay in memory and the panel is simply re-derived, so **the score cannot change when the language does**. The choice lasts for the session and is deliberately not saved, which keeps the no-storage guarantee below literally true.
+
+Division names such as `Bronze` or `Champion (1.9k+)` stay untranslated so they match the badge GeoGuessr shows on the profile, and the formulas themselves are arithmetic that reads the same everywhere — only the labels around them change.
+
+> Translations were produced by the author, not by native speakers of every language. Corrections are very welcome, especially for Estonian.
 
 ---
 
@@ -83,7 +108,7 @@ On every page that is not a profile, the script removes its own UI and idles.
 
 ```
 ┌────────────────────────────────────────────┐
-│ 📊 Profile Analysis                      × │  <- drag here to move
+│ 📊 Profile Analysis        [English v]   × │  <- drag here to move
 ├────────────────────────────────────────────┤
 │  🏆  Champion (1.9k+) (1950)               │  <- rank context
 │      Expected matches: ~2500               │
@@ -288,7 +313,7 @@ This table is the model's notion of "normal", and the panel prints it inline so 
 | 1700 – 1899 | Champion (1.7k–1.8k) | 1,600 | 1,120 |
 | 1900 and above | Champion (1.9k+) | 2,500 | 1,750 |
 
-If the rating cannot be read at all, the context falls back to `Unknown` with a cap of 500.
+If the rating cannot be read at all, the context falls back to `Unknown` with a cap of 600.
 
 > **The smurf term never fires below rating 600.** Bronze and Silver accounts are exempt by design — a low-rated account with few games is just a new player, not a smurf.
 
@@ -337,7 +362,8 @@ Old (cap 250):    deficit (250-120)/250 = 0.52  -&gt;  smurf 0.52 x 0.70 = 36.4%
 |---|---|
 | Network requests | **None.** No `@grant`, no `GM_xmlhttpRequest`, no `fetch`, no `XMLHttpRequest`. |
 | Data leaving your browser | **None.** Nothing is transmitted anywhere, ever. |
-| Persistent storage | **None.** The stats cache is an in-memory object; it dies with the tab. |
+| Persistent storage | **None.** The stats cache and the language choice are in-memory only; both die with the tab. No `localStorage`, no cookies. |
+| Language detection | Reads `<html lang>` and `navigator.languages` locally. Neither is sent anywhere. |
 | Data sources | Only what is already rendered on the public profile page you are viewing. |
 | Accounts touched | Only the profile you deliberately opened. No crawling, no enumeration. |
 | Automation | One programmatic click on GeoGuessr's own "Show stats" button — the same action you would perform by hand. |
@@ -434,6 +460,11 @@ The script is a **local read-only analyzer**. It cannot see private profiles, ca
 </details>
 
 <details>
+<summary><b>Can I change the panel's language?</b></summary>
+<p>Yes. The language is auto-detected from GeoGuessr and your browser, and there is a picker in the panel header offering English, Türkçe, Eesti, Français and Deutsch. Switching does not change the score — it re-derives the panel from the same numbers already in memory. The choice lasts for the session and is not stored.</p>
+</details>
+
+<details>
 <summary><b>Does it work on mobile?</b></summary>
 <p>The analysis works anywhere a userscript manager runs, but dragging is mouse-only.</p>
 </details>
@@ -451,6 +482,16 @@ The script is a **local read-only analyzer**. It cannot see private profiles, ca
 ---
 
 ## Changelog
+
+**6.4.0 — Five languages**
+
+- The panel is now available in English, Turkish, Estonian, French and German — 50 strings per locale, covering the full math derivation and not just the headline.
+- Automatic language detection from GeoGuessr's interface language, then the browser's preferences, then English.
+- Language picker in the panel header; switching re-derives the panel from the stats already in memory, so the score never moves.
+- Locale-aware number formatting, so thousands separators follow the reader's convention.
+- The **Show stats** button is now found in any interface language, using GeoGuessr's component classes plus the `stat` root every supported language shares.
+- New **Final Weighted Score** box closing the math breakdown, showing the weighted sum that produces the headline.
+- `@namespace` now points at the script in its repository; the fallback cap for an unreadable rating is back to 600.
 
 **6.2.0 — Fair Caps**
 
