@@ -96,7 +96,11 @@
             mathConfidence: "Confidence Multiplier:",
             finalWeighted: "Final Weighted Score:",
             finalCalculation: "Calculation:",
-            finalTotal: "Total Score:"
+            finalTotal: "Total Score:",
+            inputDataTitle: "Input Data:",
+            inputDataIntro: "The exact numbers behind every formula above, so you can recompute it yourself:",
+            inputDataRating: "Rating: {rating} ({division})",
+            inputDataCapSuffix: " &middot; cap {cap}"
         },
         tr: {
             langTitle: "Dil",
@@ -145,7 +149,11 @@
             mathConfidence: "Güven Çarpanı:",
             finalWeighted: "Nihai Ağırlıklı Skor:",
             finalCalculation: "Hesaplama:",
-            finalTotal: "Toplam Skor:"
+            finalTotal: "Toplam Skor:",
+            inputDataTitle: "Girdi Verileri:",
+            inputDataIntro: "Yukarıdaki her formülün arkasındaki gerçek sayılar, isterseniz kendiniz de hesaplayabilirsiniz:",
+            inputDataRating: "Rating: {rating} ({division})",
+            inputDataCapSuffix: " &middot; tavan {cap}"
         },
         et: {
             langTitle: "Keel",
@@ -194,7 +202,11 @@
             mathConfidence: "Kindluse kordaja:",
             finalWeighted: "Lõplik kaalutud skoor:",
             finalCalculation: "Arvutus:",
-            finalTotal: "Koguskoor:"
+            finalTotal: "Koguskoor:",
+            inputDataTitle: "Sisendandmed:",
+            inputDataIntro: "Iga ülaltoodud valemi taga olevad täpsed arvud, et saaksite need ise üle arvutada:",
+            inputDataRating: "Reiting: {rating} ({division})",
+            inputDataCapSuffix: " &middot; ülempiir {cap}"
         },
         fr: {
             langTitle: "Langue",
@@ -243,7 +255,11 @@
             mathConfidence: "Multiplicateur de confiance :",
             finalWeighted: "Score pondéré final :",
             finalCalculation: "Calcul :",
-            finalTotal: "Score total :"
+            finalTotal: "Score total :",
+            inputDataTitle: "Données d'entrée :",
+            inputDataIntro: "Les chiffres exacts derrière chaque formule ci-dessus, pour que vous puissiez recalculer vous-même :",
+            inputDataRating: "Cote : {rating} ({division})",
+            inputDataCapSuffix: " &middot; plafond {cap}"
         },
         de: {
             langTitle: "Sprache",
@@ -292,7 +308,11 @@
             mathConfidence: "Konfidenz-Multiplikator:",
             finalWeighted: "Endgültiger gewichteter Score:",
             finalCalculation: "Berechnung:",
-            finalTotal: "Gesamtscore:"
+            finalTotal: "Gesamtscore:",
+            inputDataTitle: "Eingabedaten:",
+            inputDataIntro: "Die genauen Zahlen hinter jeder obigen Formel, damit du selbst nachrechnen kannst:",
+            inputDataRating: "Wertung: {rating} ({division})",
+            inputDataCapSuffix: " &middot; Obergrenze {cap}"
         }
     };
 
@@ -753,9 +773,9 @@
         const teamDet = rankAnomalySignalDetailed(stats.teamGames, stats.teamWinRate, stats.rating, rankCtx.cap * 0.7);
  
         const signals = [];
-        if (rankedDet) signals.push({ name: t("modeRanked"), weight: 0.5, value: rankedDet.value, rawDesc: t("descDuel", { games: formatNum(stats.rankedGames), wr: stats.rankedWinRate }), calcText: rankedDet.calcText });
+        if (rankedDet) signals.push({ name: t("modeRanked"), weight: 0.5, value: rankedDet.value, rawDesc: t("descDuel", { games: formatNum(stats.rankedGames), wr: stats.rankedWinRate }), calcText: rankedDet.calcText, cap: rankCtx.cap });
         if (classicDet) signals.push({ name: t("modeClassic"), weight: 0.3, value: classicDet.value, rawDesc: t("descClassic", { games: formatNum(stats.classicGames), avg: formatNum(stats.classicAverageScore) }), calcText: classicDet.calcText });
-        if (teamDet) signals.push({ name: t("modeTeam"), weight: 0.2, value: teamDet.value, rawDesc: t("descDuel", { games: formatNum(stats.teamGames), wr: stats.teamWinRate }), calcText: teamDet.calcText });
+        if (teamDet) signals.push({ name: t("modeTeam"), weight: 0.2, value: teamDet.value, rawDesc: t("descDuel", { games: formatNum(stats.teamGames), wr: stats.teamWinRate }), calcText: teamDet.calcText, cap: rankCtx.cap * 0.7 });
 
         if (signals.length < CONFIG.minimumSignals) {
             return { score: null, confidence: t("insufficient"), message: t("insufficientBody") };
@@ -1137,6 +1157,23 @@
                     </div>
                 `;
  
+                const inputDataItems = result.signals.map(s => {
+                    const capSuffix = s.cap != null ? t("inputDataCapSuffix", { cap: formatNumber(Math.round(s.cap)) }) : "";
+                    return `<li><b>${s.name}:</b> ${s.rawDesc}${capSuffix}</li>`;
+                }).join("");
+
+                const inputDataBox = `
+                    <div class="geo-divider"></div>
+                    <div class="geo-explanation">
+                        <strong>${t("inputDataTitle")}</strong><br>
+                        ${t("inputDataIntro")}
+                        <ul>
+                            <li>${t("inputDataRating", { rating: formatNumber(result.rankCtx.rating), division: result.rankCtx.name })}</li>
+                            ${inputDataItems}
+                        </ul>
+                    </div>
+                `;
+
                 personalMathHtml = `
                     <div class="geo-divider"></div>
                     <div class="geo-explanation">
@@ -1147,6 +1184,7 @@
                             ${finalScoreBox}
                         </div>
                     </div>
+                    ${inputDataBox}
                 `;
             }
  
