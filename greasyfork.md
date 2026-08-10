@@ -32,6 +32,7 @@
 <img src="https://img.shields.io/badge/dependencies-0-14532d" alt="Zero dependencies" height="20">
 <img src="https://img.shields.io/badge/network%20requests-none-71717a" alt="No network requests" height="20">
 </p>
+<p><a href="https://anomaly.magnusmagi.com"><b>Try the math yourself &rarr;</b></a></p>
 </center>
 
 Open any GeoGuessr profile and this script reads the public stats already on the page, corrects the win rates for sample size, compares match volume against what the player's division actually demands, and shows you a score from 0 to 100 — together with **every step of the arithmetic that produced it**, in your language.

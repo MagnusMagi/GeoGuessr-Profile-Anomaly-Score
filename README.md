@@ -14,7 +14,7 @@ A zero-dependency userscript that reads a public GeoGuessr profile, stabilizes i
 [![Grants](https://img.shields.io/badge/%40grant-none-71717a?style=for-the-badge)](#-privacy--permissions)
 [![Lines](https://img.shields.io/badge/lines-1228-27272a?style=for-the-badge)](geoguessr-profile-anomaly-score.js)
 
-[Install](#-installation) · [How it works](#-how-it-works) · [The math](#-the-math-in-full) · [Thresholds](#-division--threshold-reference) · [Languages](#-languages) · [FAQ](#-faq)
+[**Live demo**](https://anomaly.magnusmagi.com) · [Install](#-installation) · [How it works](#-how-it-works) · [The math](#-the-math-in-full) · [Thresholds](#-division--threshold-reference) · [Languages](#-languages) · [FAQ](#-faq)
 
 </div>
 
