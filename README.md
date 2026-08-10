@@ -7,12 +7,12 @@
 A zero-dependency userscript that reads a public GeoGuessr profile, stabilizes its win rates against small-sample noise, compares match volume to what the player's division actually demands, and renders a transparent, step-by-step derivation of every number it shows you — including the full threshold table it judged against. Available in English, Turkish, Estonian, French and German.
 
 [![Userscript](https://img.shields.io/badge/type-userscript-8b5cf6?style=for-the-badge&logo=javascript&logoColor=white)](geoguessr-profile-anomaly-score.js)
-[![Version](https://img.shields.io/badge/version-6.4.0-38bdf8?style=for-the-badge)](#-changelog)
+[![Version](https://img.shields.io/badge/version-6.5.0-38bdf8?style=for-the-badge)](#-changelog)
 [![License](https://img.shields.io/badge/license-MIT-a3e635?style=for-the-badge)](LICENSE)
 [![Languages](https://img.shields.io/badge/languages-5-8b5cf6?style=for-the-badge)](#-languages)
 [![Dependencies](https://img.shields.io/badge/dependencies-0-14532d?style=for-the-badge)](#design-principles)
 [![Grants](https://img.shields.io/badge/%40grant-none-71717a?style=for-the-badge)](#-privacy--permissions)
-[![Lines](https://img.shields.io/badge/lines-1215-27272a?style=for-the-badge)](geoguessr-profile-anomaly-score.js)
+[![Lines](https://img.shields.io/badge/lines-1228-27272a?style=for-the-badge)](geoguessr-profile-anomaly-score.js)
 
 [Install](#-installation) · [How it works](#-how-it-works) · [The math](#-the-math-in-full) · [Thresholds](#-division--threshold-reference) · [Languages](#-languages) · [FAQ](#-faq)
 
@@ -205,8 +205,8 @@ Navigate to any GeoGuessr profile — e.g. `https://www.geoguessr.com/user/<id>`
 // ==UserScript==
 // @name         GeoGuessr Profile Anomaly Score
 // @namespace    https://github.com/MagnusMagi/GeoGuessr-Profile-Anomaly-Score/blob/main/geoguessr-profile-anomaly-score.js
-// @version      6.4.0
-// @description  Rank-aware smurf detection with auto-fetch, explicit math breakdown, and visible threshold caps. Available in English, Turkish, Estonian, French and German.
+// @version      6.5.0
+// @description  Rank-aware smurf detection with auto-fetch, explicit math breakdown, and measured-calibration thresholds. Available in English, Turkish, Estonian, French and German.
 // @match        https://www.geoguessr.com/*
 // @license      MIT
 // @grant        none
@@ -464,20 +464,25 @@ Because the denominator only sums the weights present, a profile with Ranked dat
 
 `getRankContext(rating)` maps rating to a division label and an **expected match count** — the volume a legitimate player typically needs to reach that band. This table *is* the model's notion of "normal", and since 6.2.0 the panel prints it inline so users can audit it without reading the source.
 
-| Rating | Division | Expected matches ($C$) | Team cap ($0.7C$) |
-|---:|---|---:|---:|
-| < 400 | Bronze | 30 | 21 |
-| 400 – 599 | Silver | 80 | 56 |
-| 600 – 849 | Gold | 200 | 140 |
-| 850 – 1099 | Master | 350 | 245 |
-| 1100 – 1199 | Champion (1.1k) | 500 | 350 |
-| 1200 – 1299 | Champion (1.2k) | 700 | 490 |
-| 1300 – 1499 | Champion (1.3k–1.4k) | 900 | 630 |
-| 1500 – 1699 | Champion (1.5k–1.6k) | 1,200 | 840 |
-| 1700 – 1899 | Champion (1.7k–1.8k) | 1,600 | 1,120 |
-| ≥ 1900 | Champion (1.9k+) | 2,500 | 1,750 |
+Since 6.5.0, every cap is the **median ranked-duels games played** for real players in that rating cohort, sampled from [magnusgeo.magnusmagi.com/median](https://magnusgeo.magnusmagi.com/median) (100-point rating bands, weighted by cohort size where a division spans more than one band):
+
+| Rating | Division | Expected matches ($C$) | Team cap ($0.7C$) | Cohort $n$ |
+|---:|---|---:|---:|---:|
+| < 400 | Bronze | 28 | 20 | 1,725 |
+| 400 – 599 | Silver | 78 | 55 | 20,379 |
+| 600 – 849 | Gold | 280 | 196 | ≈14,573 |
+| 850 – 1099 | Master | 1,375 | 963 | ≈2,538 |
+| 1100 – 1199 | Champion (1.1k) | 3,310 | 2,317 | 368 |
+| 1200 – 1299 | Champion (1.2k) | 4,821 | 3,375 | 206 |
+| 1300 – 1499 | Champion (1.3k–1.4k) | 7,342 | 5,139 | 226 |
+| 1500 – 1699 | Champion (1.5k–1.6k) | 12,649 | 8,854 | 104 |
+| 1700 – 1899 | Champion (1.7k–1.8k) | 17,942 | 12,559 | 15 |
+| ≥ 1900 | Champion (1.9k+) | 34,743 | 24,320 | 1 ⚠️ |
 
 If rating cannot be read at all, the context falls back to `{ name: "Unknown", cap: 600 }`.
+
+> [!WARNING]
+> **The top two rows rest on a thin sample.** `/median` had 15 profiled players between 1700–1899 and exactly **one** at 1900+ (34,743 lifetime ranked games). That single point *is* the 1.9k+ cap until more players are profiled — treat scores near that boundary as lower-confidence than the rest of the table. Everything from Bronze through Champion 1.2k rests on hundreds to tens of thousands of players and is comparatively solid.
 
 > [!NOTE]
 > **The smurf term never fires below rating 600.** Bronze and Silver accounts are exempt by design — a low-rated account with few games is just a new player, not a smurf.
@@ -502,6 +507,27 @@ Every threshold came down, and the top of the ladder was consolidated from nine 
 The direction is consistent: **fewer false positives at the top of the ladder.** The old table assumed a Champion 2k+ player needed 4,000 matches, which flagged efficient climbers who simply improved fast. The new cap of 2,500 demands a much clearer volume mismatch before the smurf term contributes anything.
 
 The tradeoff is real and worth naming: **a genuine smurf sitting between the old and new caps now scores lower than it used to.** 6.2.0 trades some sensitivity for a lot of precision.
+
+### What the 6.5.0 recalibration changed
+
+6.2.0's caps were a **prior** — a reasonable guess at progression speed, tuned down to avoid flagging efficient climbers. 6.5.0 replaces the guess with **measured data**: median ranked-duels games played per rating cohort, from [magnusgeo.magnusmagi.com/median](https://magnusgeo.magnusmagi.com/median).
+
+| Division | 6.2.0 cap | 6.5.0 cap | Change |
+|---|---:|---:|---:|
+| Bronze | 30 | 28 | −7% |
+| Silver | 80 | 78 | −3% |
+| Gold | 200 | 280 | +40% |
+| Master | 350 | 1,375 | +293% |
+| Champion 1.1k | 500 | 3,310 | +562% |
+| Champion 1.2k | 700 | 4,821 | +589% |
+| Champion 1.3k–1.4k | 900 | 7,342 | +716% |
+| Champion 1.5k–1.6k | 1,200 | 12,649 | +954% |
+| Champion 1.7k–1.8k | 1,600 | 17,942 | +1,021% |
+| Champion 1.9k+ | 2,500 | 34,743 | +1,290% |
+
+Bronze and Silver barely moved — the 6.2.0 priors happened to be close. Everything from Gold up moved sharply **higher**, in the opposite direction from 6.2.0: it turns out real players need far more games to reach Master and Champion than either the 1.0.0 or the 6.2.0 table assumed. Under the old, too-low caps, `games ≥ expectedCap` was true for the overwhelming majority of legitimate high-division players, so the smurf term rarely contributed anything above Gold — 6.2.0 wasn't just conservative there, it was close to inert. 6.5.0 restores real sensitivity at the top of the ladder, backed by a measured baseline instead of a guess.
+
+This does reintroduce some of the false-positive risk 6.2.0 was written to avoid, for players who climbed unusually efficiently. See the [top-of-table sample-size warning](#-division--threshold-reference) — the 1.9k+ cap is one data point.
 
 ---
 
@@ -777,8 +803,8 @@ The script is a **local read-only analyzer**. It cannot see private profiles, ca
 
 - **Correlation, not proof.** Every signal has innocent explanations: returning veterans, players who moved from another platform, coaching accounts, or someone who simply had a great month.
 - **Deliberately blind below 600 rating.** The smurf term never fires for Bronze/Silver, so a low-rated smurf who hasn't climbed yet is invisible to the model.
-- **6.2.0 is less sensitive by design.** The lowered caps cut false positives, but a real smurf whose match count falls between the old and new thresholds now scores lower than it would have under 1.0.0.
-- **Division caps are heuristics.** They encode a reasonable prior about progression speed, not measured population data. Skilled players legitimately climb faster than any table assumes.
+- **Division caps above Gold rest on a small population sample.** 6.5.0's caps are measured medians, but the Champion 1.7k–1.8k row has 15 profiled players and 1.9k+ has exactly 1. Those two rows will move as [magnusgeo.magnusmagi.com/median](https://magnusgeo.magnusmagi.com/median) accumulates more data — treat scores near that boundary as lower-confidence.
+- **6.5.0 trades precision for sensitivity relative to 6.2.0.** The measured caps are far higher than 6.2.0's tuned-down priors, so the smurf term now contributes more often above Gold. That's more accurate, but it also reintroduces some of the false-positive risk on unusually efficient legitimate climbers that 6.2.0 was written to avoid.
 - **Team Duels are noisy.** Team performance depends heavily on teammates, which is why the mode carries the lowest weight (0.20) and a discounted cap.
 - **Classic has no win rate.** Its signal rests entirely on average score, which is map- and mode-dependent and can be inflated by playing easy maps.
 
@@ -788,8 +814,7 @@ The script is a **local read-only analyzer**. It cannot see private profiles, ca
 - **Private profiles yield nothing.** Hidden stats produce `Insufficient data` and no score.
 - **Desktop drag only.** `makeDraggable()` binds `mousedown`/`mousemove` — there is no touch/pointer handling for mobile.
 - **The panel's cap list is hard-coded.** It's a literal string in `updatePanelContent()`, not derived from `getRankContext()`. Editing one without the other makes the displayed table lie about the model.
-- **Team caps show floating-point artifacts.** `cap * 0.7` is computed in binary floating point, so the Master and Champion 1.2k tiers produce `244.99999999999997` and `489.99999999999994`. Those raw values are interpolated straight into the Team mode's *Smurf Multiplier* formula text, so affected profiles display an 18-digit number in the breakdown. Cosmetic only — the arithmetic is unaffected. A `Math.round()` at the call site fixes it.
-- **`hasAttemptedAutoFetch` is assigned but never declared** (line 759, still present in 6.2.0). Under `"use strict"` this throws a `ReferenceError` on the first analysis of each new path, which skips the `removeUI()` call on the same tick — a stale panel can briefly persist across profiles. See [Contributing](#-contributing); this is a good first fix.
+- **Team caps show floating-point artifacts.** `cap * 0.7` is computed in binary floating point, so several tiers produce values like `244.99999999999997`. Those raw values are interpolated straight into the Team mode's *Smurf Multiplier* formula text, so affected profiles display a long decimal in the breakdown. Cosmetic only — the arithmetic is unaffected. A `Math.round()` at the call site fixes it.
 
 ---
 
@@ -930,6 +955,14 @@ Ranked Duels are the most controlled signal available: fixed format, matchmade o
 
 ## 📌 Changelog
 
+### 6.5.0 — *Measured calibration*
+
+- **Fixed:** `hasAttemptedAutoFetch` was assigned but never declared. Under `"use strict"` this threw a `ReferenceError` on the first analysis of every new profile path, silently skipping that tick's `removeUI()` call. Removed the dead assignment.
+- **Fixed:** the *Risk Curve* explanation claimed the anomaly signal "scales up aggressively above 70%"; the curve's real slope is steepest between 62–70% and flattens above it. Reworded in all 5 languages.
+- **Fixed:** the *Smurf Multiplier* "not applied" message always blamed the match-count cap, even when the multiplier was skipped because the player's division was below Gold. Split into two distinct, locale-aware messages that report the real reason.
+- **Fixed:** Team Duels silently use 70% of the caps shown in the *Expected Match Thresholds* table; added a disclosure line instead of leaving it implicit in the raw formula.
+- **Recalibrated every division cap from measured data.** Caps are now the median ranked-duels games played per rating cohort, sourced from [magnusgeo.magnusmagi.com/median](https://magnusgeo.magnusmagi.com/median), replacing the 6.2.0 heuristic table. See [What the 6.5.0 recalibration changed](#what-the-650-recalibration-changed) — Bronze and Silver barely moved, Gold through Champion 1.9k+ moved sharply higher.
+
 ### 6.4.0 — *Five languages*
 
 - **The panel is now available in English, Turkish, Estonian, French and German** — 50 strings per locale, covering the full math derivation, not just the headline.
@@ -962,13 +995,13 @@ Ranked Duels are the most controlled signal available: fixed format, matchmade o
 
 ## 🗺️ Roadmap
 
-- [ ] Fix the undeclared `hasAttemptedAutoFetch` assignment
+- [x] ~~Fix the undeclared `hasAttemptedAutoFetch` assignment~~ — fixed in 6.5.0
 - [ ] Round the Team cap so the breakdown stops printing `489.99999999999994`
 - [ ] Generate the in-panel cap list from `getRankContext()` instead of a hard-coded string
 - [x] ~~Point `@namespace` back at the repository URL~~ — fixed in 6.4.0
 - [ ] Touch/pointer support for dragging on mobile
 - [ ] Persist panel position and dismissal state across sessions
-- [ ] Calibrate division caps against real population data instead of priors
+- [x] ~~Calibrate division caps against real population data instead of priors~~ — done in 6.5.0, sourced from magnusgeo.magnusmagi.com/median
 - [ ] Copy-to-clipboard export of the full math breakdown
 - [ ] Light-theme variant of the panel
 - [ ] Configurable weights and thresholds via an in-panel settings pane

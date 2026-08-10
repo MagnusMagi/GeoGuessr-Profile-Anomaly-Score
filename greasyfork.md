@@ -26,7 +26,7 @@
 <p><b>Rank-aware smurf detection with an explicitly mapped math breakdown and visible threshold caps.</b></p>
 <p><b>English · Türkçe · Eesti · Français · Deutsch</b></p>
 <p>
-<img src="https://img.shields.io/badge/version-6.4.0-38bdf8" alt="Version 6.4.0" height="20">
+<img src="https://img.shields.io/badge/version-6.5.0-38bdf8" alt="Version 6.5.0" height="20">
 <img src="https://img.shields.io/badge/license-MIT-a3e635" alt="MIT license" height="20">
 <img src="https://img.shields.io/badge/languages-5-8b5cf6" alt="Five languages" height="20">
 <img src="https://img.shields.io/badge/dependencies-0-14532d" alt="Zero dependencies" height="20">
@@ -300,20 +300,24 @@ Because the denominator only sums the weights present, a profile with Ranked dat
 
 This table is the model's notion of "normal", and the panel prints it inline so you can audit it without reading the source.
 
-| Rating | Division | Expected matches (C) | Team cap (0.7 x C) |
-|---|---|---|---|
-| below 400 | Bronze | 30 | 21 |
-| 400 – 599 | Silver | 80 | 56 |
-| 600 – 849 | Gold | 200 | 140 |
-| 850 – 1099 | Master | 350 | 245 |
-| 1100 – 1199 | Champion (1.1k) | 500 | 350 |
-| 1200 – 1299 | Champion (1.2k) | 700 | 490 |
-| 1300 – 1499 | Champion (1.3k–1.4k) | 900 | 630 |
-| 1500 – 1699 | Champion (1.5k–1.6k) | 1,200 | 840 |
-| 1700 – 1899 | Champion (1.7k–1.8k) | 1,600 | 1,120 |
-| 1900 and above | Champion (1.9k+) | 2,500 | 1,750 |
+Since 6.5.0, every cap is the **median ranked-duels games played** for real players in that rating cohort, sampled from [magnusgeo.magnusmagi.com/median](https://magnusgeo.magnusmagi.com/median):
+
+| Rating | Division | Expected matches (C) | Team cap (0.7 x C) | Cohort n |
+|---|---|---|---|---|
+| below 400 | Bronze | 28 | 20 | 1,725 |
+| 400 – 599 | Silver | 78 | 55 | 20,379 |
+| 600 – 849 | Gold | 280 | 196 | ≈14,573 |
+| 850 – 1099 | Master | 1,375 | 963 | ≈2,538 |
+| 1100 – 1199 | Champion (1.1k) | 3,310 | 2,317 | 368 |
+| 1200 – 1299 | Champion (1.2k) | 4,821 | 3,375 | 206 |
+| 1300 – 1499 | Champion (1.3k–1.4k) | 7,342 | 5,139 | 226 |
+| 1500 – 1699 | Champion (1.5k–1.6k) | 12,649 | 8,854 | 104 |
+| 1700 – 1899 | Champion (1.7k–1.8k) | 17,942 | 12,559 | 15 |
+| 1900 and above | Champion (1.9k+) | 34,743 | 24,320 | 1 (single data point) |
 
 If the rating cannot be read at all, the context falls back to `Unknown` with a cap of 600.
+
+The top two rows rest on a thin sample — 15 profiled players between 1700-1899, and exactly one at 1900+. Treat scores near that boundary as lower-confidence than the rest of the table.
 
 > **The smurf term never fires below rating 600.** Bronze and Silver accounts are exempt by design — a low-rated account with few games is just a new player, not a smurf.
 
@@ -378,8 +382,8 @@ The script is a **local read-only analyzer**. It cannot see private profiles, ca
 
 - **Correlation, not proof.** Every signal has innocent explanations: returning veterans, players who moved from another platform, coaching accounts, or someone who simply had a great month.
 - **Deliberately blind below rating 600.** A low-rated smurf who has not climbed yet is invisible to the model.
-- **6.2.0 is less sensitive by design.** The lowered caps cut false positives, but a real smurf whose match count falls between the old and new thresholds now scores lower.
-- **The caps are heuristics.** They encode a reasonable prior about progression speed, not measured population data. Skilled players legitimately climb faster than any table assumes.
+- **Division caps above Gold rest on a small population sample.** 6.5.0's caps are measured medians, but Champion 1.7k-1.8k has 15 profiled players and 1.9k+ has exactly 1. Treat scores near that boundary as lower-confidence.
+- **6.5.0 trades precision for sensitivity relative to 6.2.0.** The measured caps are far higher than 6.2.0's tuned-down priors, so the smurf term now contributes more often above Gold — more accurate, but it reintroduces some false-positive risk on unusually efficient legitimate climbers.
 - **Team Duels are noisy.** Performance depends heavily on teammates, which is why the mode carries the lowest weight and a discounted cap.
 - **Classic has no win rate.** Its signal rests entirely on average score, which is map-dependent and can be inflated by playing easy maps.
 
@@ -482,6 +486,14 @@ The script is a **local read-only analyzer**. It cannot see private profiles, ca
 ---
 
 ## Changelog
+
+**6.5.0 — Measured calibration**
+
+- Fixed an undeclared `hasAttemptedAutoFetch` assignment that threw a `ReferenceError` under strict mode on every profile route change, skipping that tick's UI cleanup.
+- Corrected the Risk Curve explanation, which claimed the signal "scales up aggressively above 70%" when the real curve is steepest between 62-70% and flattens above it.
+- The Smurf Multiplier "not applied" message now reports the real reason (rank below Gold vs. matches over the cap) instead of always blaming the match cap.
+- Disclosed that Team Duels use 70% of the caps shown in the threshold table.
+- Recalibrated every division cap from measured data: median ranked-duels games played per rating cohort, sourced from magnusgeo.magnusmagi.com/median. Bronze and Silver barely moved; Gold through Champion 1.9k+ moved sharply higher, since real players need far more games at the top of the ladder than the 6.2.0 heuristic table assumed.
 
 **6.4.0 — Five languages**
 

@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         GeoGuessr Profile Anomaly Score
 // @namespace    https://github.com/MagnusMagi/GeoGuessr-Profile-Anomaly-Score/blob/main/geoguessr-profile-anomaly-score.js
-// @version      6.4.0
-// @description  Rank-aware smurf detection with auto-fetch, explicit math breakdown, and visible threshold caps. Available in English, Turkish, Estonian, French and German.
+// @version      6.5.0
+// @description  Rank-aware smurf detection with auto-fetch, explicit math breakdown, and measured-calibration thresholds. Available in English, Turkish, Estonian, French and German.
 // @match        https://www.geoguessr.com/*
 // @license      MIT
 // @grant        none
@@ -598,16 +598,18 @@
 
         if (rating == null) return { name, cap, rating: "?" };
  
-        if (rating < 400) { name = "Bronze"; cap = 30; }
-        else if (rating < 600) { name = "Silver"; cap = 80; }
-        else if (rating < 850) { name = "Gold"; cap = 200; }
-        else if (rating < 1100) { name = "Master"; cap = 350; }
-        else if (rating < 1200) { name = "Champion (1.1k)"; cap = 500; }
-        else if (rating < 1300) { name = "Champion (1.2k)"; cap = 700; }
-        else if (rating < 1500) { name = "Champion (1.3k-1.4k)"; cap = 900; }
-        else if (rating < 1700) { name = "Champion (1.5k-1.6k)"; cap = 1200; }
-        else if (rating < 1900) { name = "Champion (1.7k-1.8k)"; cap = 1600; }
-        else { name = "Champion (1.9k+)"; cap = 2500; }
+        // Caps are the median ranked-duels games played per 100-rating cohort,
+        // sampled from magnusgeo.magnusmagi.com/median (see /median for methodology).
+        if (rating < 400) { name = "Bronze"; cap = 28; }
+        else if (rating < 600) { name = "Silver"; cap = 78; }
+        else if (rating < 850) { name = "Gold"; cap = 280; }
+        else if (rating < 1100) { name = "Master"; cap = 1375; }
+        else if (rating < 1200) { name = "Champion (1.1k)"; cap = 3310; }
+        else if (rating < 1300) { name = "Champion (1.2k)"; cap = 4821; }
+        else if (rating < 1500) { name = "Champion (1.3k-1.4k)"; cap = 7342; }
+        else if (rating < 1700) { name = "Champion (1.5k-1.6k)"; cap = 12649; }
+        else if (rating < 1900) { name = "Champion (1.7k-1.8k)"; cap = 17942; }
+        else { name = "Champion (1.9k+)"; cap = 34743; }
  
         return { name, cap, rating };
     }
@@ -1042,9 +1044,9 @@
                     <div class="geo-divider"></div>
                     <strong>${t("capsTitle")}</strong>
                     <div class="geo-cap-list">
-                        Bronze: 30 | Silver: 80 | Gold: 200 | Master: 350<br>
-                        Champ 1.1k: 500 | 1.2k: 700 | 1.4k: 900<br>
-                        Champ 1.6k: 1200 | 1.8k: 1600 | 1.9k+: 2500
+                        Bronze: 28 | Silver: 78 | Gold: 280 | Master: 1375<br>
+                        Champ 1.1k: 3310 | 1.2k: 4821 | 1.4k: 7342<br>
+                        Champ 1.6k: 12649 | 1.8k: 17942 | 1.9k+: 34743
                     </div>
                     <div class="geo-cap-list-note">${t("capsTeamNote")}</div>
                 </div>
