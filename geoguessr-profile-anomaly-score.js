@@ -1170,7 +1170,6 @@
             // re-render the previous profile's numbers.
             lastStats = null;
             isPanelManuallyClosed = false;
-            hasAttemptedAutoFetch = false;
             removeUI();
         }
  
