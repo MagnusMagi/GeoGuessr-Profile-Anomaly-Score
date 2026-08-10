@@ -87,6 +87,7 @@
             mathBase: "Base Anomaly (Risk Curve):",
             mathCurveApplied: "Curve limit applied to {stab}% = {base}%",
             mathSmurf: "Smurf Multiplier:",
+            mathSmurfCapLabel: "cap",
             mathSmurfSkippedCap: "Not applied (Matches &gt;= Expected Cap)",
             mathSmurfSkippedRank: "Not applied (rank below Gold)",
             mathApplied: "Applied Signal:",
@@ -135,6 +136,7 @@
             mathBase: "Temel Anomali (Risk Eğrisi):",
             mathCurveApplied: "%{stab} değerine eğri sınırı uygulandı = %{base}",
             mathSmurf: "Smurf Çarpanı:",
+            mathSmurfCapLabel: "tavan",
             mathSmurfSkippedCap: "Uygulanmadı (Maç sayısı &gt;= Beklenen tavan)",
             mathSmurfSkippedRank: "Uygulanmadı (lig Gold altında)",
             mathApplied: "Uygulanan Sinyal:",
@@ -183,6 +185,7 @@
             mathBase: "Baasanomaalia (riskikõver):",
             mathCurveApplied: "Kõvera piirang rakendatud väärtusele {stab}% = {base}%",
             mathSmurf: "Smurf-kordaja:",
+            mathSmurfCapLabel: "ülempiir",
             mathSmurfSkippedCap: "Ei rakendatud (mänge &gt;= eeldatav ülempiir)",
             mathSmurfSkippedRank: "Ei rakendatud (liiga alla Gold)",
             mathApplied: "Rakendatud signaal:",
@@ -231,6 +234,7 @@
             mathBase: "Anomalie de base (courbe de risque) :",
             mathCurveApplied: "Limite de courbe appliquée à {stab} % = {base} %",
             mathSmurf: "Multiplicateur smurf :",
+            mathSmurfCapLabel: "plafond",
             mathSmurfSkippedCap: "Non appliqué (matchs &gt;= plafond attendu)",
             mathSmurfSkippedRank: "Non appliqué (division inférieure à Gold)",
             mathApplied: "Signal appliqué :",
@@ -279,6 +283,7 @@
             mathBase: "Basis-Anomalie (Risikokurve):",
             mathCurveApplied: "Kurvengrenze angewendet auf {stab} % = {base} %",
             mathSmurf: "Smurf-Multiplikator:",
+            mathSmurfCapLabel: "Obergrenze",
             mathSmurfSkippedCap: "Nicht angewendet (Spiele &gt;= erwartete Obergrenze)",
             mathSmurfSkippedRank: "Nicht angewendet (Liga unter Gold)",
             mathApplied: "Angewendetes Signal:",
@@ -666,7 +671,7 @@
                 </div>
                 <div class="geo-math-row">
                     <span class="geo-math-row-title">${t("mathSmurf")}</span>
-                    <span class="geo-math-row-formula">(${expectedCap} - ${games}) / ${expectedCap} * ${wrStr}% = ${smurfStr}%</span>
+                    <span class="geo-math-row-formula">(${t("mathSmurfCapLabel")} ${expectedCap} - ${games}) / ${t("mathSmurfCapLabel")} ${expectedCap} * ${wrStr}% = ${smurfStr}%</span>
                 </div>
                 <div class="geo-math-final">
                     <span>${t("mathApplied")}</span>
