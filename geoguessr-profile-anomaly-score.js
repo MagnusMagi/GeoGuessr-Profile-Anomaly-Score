@@ -79,6 +79,7 @@
             howWeightsText: "Ranked (50%), Classic (30%), Team (20%).",
             capsTitle: "Expected Match Thresholds (Caps):",
             capsTeamNote: "Team Duels use 70% of these caps.",
+            capsSourceLink: "Data source: magnusgeo.magnusmagi.com/median",
             mathTitle: "Personal Math Breakdown:",
             mathIntro: "The step-by-step mathematical logic for this profile:",
             mathModeDetails: "{mode} Mode Details:",
@@ -126,6 +127,7 @@
             howWeightsText: "Dereceli (%50), Klasik (%30), Takım (%20).",
             capsTitle: "Beklenen Maç Eşikleri (Tavanlar):",
             capsTeamNote: "Takım Düellosu bu tavanların %70'ini kullanır.",
+            capsSourceLink: "Veri kaynağı: magnusgeo.magnusmagi.com/median",
             mathTitle: "Kişisel Matematik Dökümü:",
             mathIntro: "Bu profil için adım adım matematiksel mantık:",
             mathModeDetails: "{mode} Modu Detayları:",
@@ -173,6 +175,7 @@
             howWeightsText: "Reitingumängud (50%), Klassikaline (30%), Meeskond (20%).",
             capsTitle: "Eeldatavad mängude lävendid (ülempiirid):",
             capsTeamNote: "Meeskonnaduellid kasutavad neist ülempiiridest 70%.",
+            capsSourceLink: "Andmeallikas: magnusgeo.magnusmagi.com/median",
             mathTitle: "Isiklik arvutuskäik:",
             mathIntro: "Selle profiili samm-sammuline matemaatiline loogika:",
             mathModeDetails: "{mode} režiimi üksikasjad:",
@@ -220,6 +223,7 @@
             howWeightsText: "Classé (50 %), Classique (30 %), Équipe (20 %).",
             capsTitle: "Seuils de matchs attendus (plafonds) :",
             capsTeamNote: "Les duels d'équipe utilisent 70 % de ces plafonds.",
+            capsSourceLink: "Source des données : magnusgeo.magnusmagi.com/median",
             mathTitle: "Détail du calcul personnel :",
             mathIntro: "La logique mathématique étape par étape pour ce profil :",
             mathModeDetails: "Détails du mode {mode} :",
@@ -267,6 +271,7 @@
             howWeightsText: "Gewertet (50 %), Klassisch (30 %), Team (20 %).",
             capsTitle: "Erwartete Spielzahl-Schwellen (Obergrenzen):",
             capsTeamNote: "Team-Duelle verwenden 70 % dieser Obergrenzen.",
+            capsSourceLink: "Datenquelle: magnusgeo.magnusmagi.com/median",
             mathTitle: "Persönliche Rechenaufschlüsselung:",
             mathIntro: "Die schrittweise mathematische Logik für dieses Profil:",
             mathModeDetails: "Details zum Modus {mode}:",
@@ -868,6 +873,8 @@
             /* Threshold List */
             #${CONFIG.panelId} .geo-cap-list { font-family: monospace; color: #8f8f97; background: rgba(0,0,0,0.25); padding: 6px; border-radius: 4px; margin-top: 6px; line-height: 1.5; font-size: 10px; }
             #${CONFIG.panelId} .geo-cap-list-note { color: #71717a; font-size: 10px; margin-top: 4px; }
+            #${CONFIG.panelId} .geo-cap-source-link { display: block; color: #a3e635; font-size: 10px; margin-top: 6px; text-decoration: none; }
+            #${CONFIG.panelId} .geo-cap-source-link:hover { text-decoration: underline; }
  
             #${CONFIG.panelId} .low { background: #14532d; color: #bbf7d0; }
             #${CONFIG.panelId} .limited { background: #713f12; color: #fde68a; }
@@ -1049,6 +1056,7 @@
                         Champ 1.6k: 12649 | 1.8k: 17942 | 1.9k+: 34743
                     </div>
                     <div class="geo-cap-list-note">${t("capsTeamNote")}</div>
+                    <a class="geo-cap-source-link" href="https://magnusgeo.magnusmagi.com/median" target="_blank" rel="noopener noreferrer">${t("capsSourceLink")} ↗</a>
                 </div>
             `;
  
