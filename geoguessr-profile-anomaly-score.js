@@ -72,12 +72,13 @@
             howStabLabel: "Stabilization:",
             howStabText: "Adds 50 hypothetical matches (50% win rate) to filter out lucky streaks on new accounts.",
             howCurveLabel: "Risk Curve:",
-            howCurveText: "Anomaly starts if the stabilized win rate exceeds 56%, and scales up aggressively above 70%.",
+            howCurveText: "Anomaly starts once the stabilized win rate exceeds 56%, rises steeply between 62% and 70%, then increases more gradually above 70%.",
             howSmurfLabel: "Smurf Boost:",
-            howSmurfText: "Multiplies the score if the player reached a high division with suspiciously few matches.",
+            howSmurfText: "Multiplies the score if a Gold+ player reached their division with suspiciously few matches.",
             howWeightsLabel: "Weights:",
             howWeightsText: "Ranked (50%), Classic (30%), Team (20%).",
             capsTitle: "Expected Match Thresholds (Caps):",
+            capsTeamNote: "Team Duels use 70% of these caps.",
             mathTitle: "Personal Math Breakdown:",
             mathIntro: "The step-by-step mathematical logic for this profile:",
             mathModeDetails: "{mode} Mode Details:",
@@ -85,7 +86,8 @@
             mathBase: "Base Anomaly (Risk Curve):",
             mathCurveApplied: "Curve limit applied to {stab}% = {base}%",
             mathSmurf: "Smurf Multiplier:",
-            mathSmurfSkipped: "Not applied (Matches &gt;= Expected Cap)",
+            mathSmurfSkippedCap: "Not applied (Matches &gt;= Expected Cap)",
+            mathSmurfSkippedRank: "Not applied (rank below Gold)",
             mathApplied: "Applied Signal:",
             mathScoreAnomaly: "Score Anomaly:",
             mathBasedOnAvg: "Based on avg {avg} = {score}%",
@@ -117,12 +119,13 @@
             howStabLabel: "Dengeleme:",
             howStabText: "Yeni hesaplardaki şans serilerini elemek için 50 varsayımsal maç (%50 kazanma oranı) ekler.",
             howCurveLabel: "Risk Eğrisi:",
-            howCurveText: "Dengelenmiş kazanma oranı %56'yı aşınca anomali başlar, %70 üzerinde hızla yükselir.",
+            howCurveText: "Dengelenmiş kazanma oranı %56'yı aşınca anomali başlar, %62-%70 arasında hızla yükselir, %70 üzerinde ise daha kademeli artar.",
             howSmurfLabel: "Smurf Çarpanı:",
-            howSmurfText: "Oyuncu şüpheli derecede az maçla yüksek bir lige ulaştıysa skoru büyütür.",
+            howSmurfText: "Gold ve üzeri bir oyuncu ligine şüpheli derecede az maçla ulaştıysa skoru büyütür.",
             howWeightsLabel: "Ağırlıklar:",
             howWeightsText: "Dereceli (%50), Klasik (%30), Takım (%20).",
             capsTitle: "Beklenen Maç Eşikleri (Tavanlar):",
+            capsTeamNote: "Takım Düellosu bu tavanların %70'ini kullanır.",
             mathTitle: "Kişisel Matematik Dökümü:",
             mathIntro: "Bu profil için adım adım matematiksel mantık:",
             mathModeDetails: "{mode} Modu Detayları:",
@@ -130,7 +133,8 @@
             mathBase: "Temel Anomali (Risk Eğrisi):",
             mathCurveApplied: "%{stab} değerine eğri sınırı uygulandı = %{base}",
             mathSmurf: "Smurf Çarpanı:",
-            mathSmurfSkipped: "Uygulanmadı (Maç sayısı &gt;= Beklenen tavan)",
+            mathSmurfSkippedCap: "Uygulanmadı (Maç sayısı &gt;= Beklenen tavan)",
+            mathSmurfSkippedRank: "Uygulanmadı (lig Gold altında)",
             mathApplied: "Uygulanan Sinyal:",
             mathScoreAnomaly: "Skor Anomalisi:",
             mathBasedOnAvg: "{avg} ortalamasına göre = %{score}",
@@ -162,12 +166,13 @@
             howStabLabel: "Stabiliseerimine:",
             howStabText: "Lisab 50 hüpoteetilist mängu (50% võidumäär), et välistada uute kontode õnneseeriad.",
             howCurveLabel: "Riskikõver:",
-            howCurveText: "Anomaalia algab, kui stabiliseeritud võidumäär ületab 56%, ja kasvab järsult üle 70%.",
+            howCurveText: "Anomaalia algab, kui stabiliseeritud võidumäär ületab 56%, tõuseb järsult vahemikus 62–70% ja kasvab üle 70% aeglasemalt.",
             howSmurfLabel: "Smurf-kordaja:",
-            howSmurfText: "Suurendab skoori, kui mängija jõudis kõrgesse divisjoni kahtlaselt väheste mängudega.",
+            howSmurfText: "Suurendab skoori, kui Gold või kõrgema divisjoni mängija jõudis sinna kahtlaselt väheste mängudega.",
             howWeightsLabel: "Kaalud:",
             howWeightsText: "Reitingumängud (50%), Klassikaline (30%), Meeskond (20%).",
             capsTitle: "Eeldatavad mängude lävendid (ülempiirid):",
+            capsTeamNote: "Meeskonnaduellid kasutavad neist ülempiiridest 70%.",
             mathTitle: "Isiklik arvutuskäik:",
             mathIntro: "Selle profiili samm-sammuline matemaatiline loogika:",
             mathModeDetails: "{mode} režiimi üksikasjad:",
@@ -175,7 +180,8 @@
             mathBase: "Baasanomaalia (riskikõver):",
             mathCurveApplied: "Kõvera piirang rakendatud väärtusele {stab}% = {base}%",
             mathSmurf: "Smurf-kordaja:",
-            mathSmurfSkipped: "Ei rakendatud (mänge &gt;= eeldatav ülempiir)",
+            mathSmurfSkippedCap: "Ei rakendatud (mänge &gt;= eeldatav ülempiir)",
+            mathSmurfSkippedRank: "Ei rakendatud (liiga alla Gold)",
             mathApplied: "Rakendatud signaal:",
             mathScoreAnomaly: "Skoori anomaalia:",
             mathBasedOnAvg: "Keskmise {avg} põhjal = {score}%",
@@ -207,12 +213,13 @@
             howStabLabel: "Stabilisation :",
             howStabText: "Ajoute 50 matchs hypothétiques (50 % de victoires) pour filtrer les séries chanceuses des nouveaux comptes.",
             howCurveLabel: "Courbe de risque :",
-            howCurveText: "L'anomalie démarre lorsque le taux de victoires stabilisé dépasse 56 %, et grimpe fortement au-delà de 70 %.",
+            howCurveText: "L'anomalie démarre lorsque le taux de victoires stabilisé dépasse 56 %, grimpe fortement entre 62 % et 70 %, puis augmente plus progressivement au-delà de 70 %.",
             howSmurfLabel: "Bonus smurf :",
-            howSmurfText: "Amplifie le score si le joueur a atteint une division élevée avec étonnamment peu de matchs.",
+            howSmurfText: "Amplifie le score si un joueur en division Gold ou supérieure l'a atteinte avec étonnamment peu de matchs.",
             howWeightsLabel: "Pondérations :",
             howWeightsText: "Classé (50 %), Classique (30 %), Équipe (20 %).",
             capsTitle: "Seuils de matchs attendus (plafonds) :",
+            capsTeamNote: "Les duels d'équipe utilisent 70 % de ces plafonds.",
             mathTitle: "Détail du calcul personnel :",
             mathIntro: "La logique mathématique étape par étape pour ce profil :",
             mathModeDetails: "Détails du mode {mode} :",
@@ -220,7 +227,8 @@
             mathBase: "Anomalie de base (courbe de risque) :",
             mathCurveApplied: "Limite de courbe appliquée à {stab} % = {base} %",
             mathSmurf: "Multiplicateur smurf :",
-            mathSmurfSkipped: "Non appliqué (matchs &gt;= plafond attendu)",
+            mathSmurfSkippedCap: "Non appliqué (matchs &gt;= plafond attendu)",
+            mathSmurfSkippedRank: "Non appliqué (division inférieure à Gold)",
             mathApplied: "Signal appliqué :",
             mathScoreAnomaly: "Anomalie de score :",
             mathBasedOnAvg: "D'après une moyenne de {avg} = {score} %",
@@ -252,12 +260,13 @@
             howStabLabel: "Stabilisierung:",
             howStabText: "Fügt 50 hypothetische Spiele (50 % Siegquote) hinzu, um Glückssträhnen neuer Konten herauszufiltern.",
             howCurveLabel: "Risikokurve:",
-            howCurveText: "Die Anomalie beginnt, wenn die stabilisierte Siegquote 56 % übersteigt, und steigt oberhalb von 70 % stark an.",
+            howCurveText: "Die Anomalie beginnt, wenn die stabilisierte Siegquote 56 % übersteigt, steigt zwischen 62 % und 70 % stark an und danach oberhalb von 70 % gleichmäßiger.",
             howSmurfLabel: "Smurf-Verstärkung:",
-            howSmurfText: "Erhöht den Wert, wenn ein Spieler mit verdächtig wenigen Spielen eine hohe Division erreicht hat.",
+            howSmurfText: "Erhöht den Wert, wenn ein Spieler ab Gold seine Division mit verdächtig wenigen Spielen erreicht hat.",
             howWeightsLabel: "Gewichtungen:",
             howWeightsText: "Gewertet (50 %), Klassisch (30 %), Team (20 %).",
             capsTitle: "Erwartete Spielzahl-Schwellen (Obergrenzen):",
+            capsTeamNote: "Team-Duelle verwenden 70 % dieser Obergrenzen.",
             mathTitle: "Persönliche Rechenaufschlüsselung:",
             mathIntro: "Die schrittweise mathematische Logik für dieses Profil:",
             mathModeDetails: "Details zum Modus {mode}:",
@@ -265,7 +274,8 @@
             mathBase: "Basis-Anomalie (Risikokurve):",
             mathCurveApplied: "Kurvengrenze angewendet auf {stab} % = {base} %",
             mathSmurf: "Smurf-Multiplikator:",
-            mathSmurfSkipped: "Nicht angewendet (Spiele &gt;= erwartete Obergrenze)",
+            mathSmurfSkippedCap: "Nicht angewendet (Spiele &gt;= erwartete Obergrenze)",
+            mathSmurfSkippedRank: "Nicht angewendet (Liga unter Gold)",
             mathApplied: "Angewendetes Signal:",
             mathScoreAnomaly: "Punkte-Anomalie:",
             mathBasedOnAvg: "Basierend auf Durchschnitt {avg} = {score} %",
@@ -668,7 +678,7 @@
                 </div>
                 <div class="geo-math-row">
                     <span class="geo-math-row-title">${t("mathSmurf")}</span>
-                    <span class="geo-math-row-formula" style="color:#71717a; background: transparent; padding: 0;">${t("mathSmurfSkipped")}</span>
+                    <span class="geo-math-row-formula" style="color:#71717a; background: transparent; padding: 0;">${t(rating >= 600 ? "mathSmurfSkippedCap" : "mathSmurfSkippedRank")}</span>
                 </div>
                 <div class="geo-math-final">
                     <span>${t("mathApplied")}</span>
@@ -855,6 +865,7 @@
  
             /* Threshold List */
             #${CONFIG.panelId} .geo-cap-list { font-family: monospace; color: #8f8f97; background: rgba(0,0,0,0.25); padding: 6px; border-radius: 4px; margin-top: 6px; line-height: 1.5; font-size: 10px; }
+            #${CONFIG.panelId} .geo-cap-list-note { color: #71717a; font-size: 10px; margin-top: 4px; }
  
             #${CONFIG.panelId} .low { background: #14532d; color: #bbf7d0; }
             #${CONFIG.panelId} .limited { background: #713f12; color: #fde68a; }
@@ -1035,6 +1046,7 @@
                         Champ 1.1k: 500 | 1.2k: 700 | 1.4k: 900<br>
                         Champ 1.6k: 1200 | 1.8k: 1600 | 1.9k+: 2500
                     </div>
+                    <div class="geo-cap-list-note">${t("capsTeamNote")}</div>
                 </div>
             `;
  
