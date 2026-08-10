@@ -246,6 +246,12 @@
   .mode-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; font-family: var(--font-display); font-size: .72rem; text-transform: uppercase; letter-spacing: .05em; color: var(--ink); }
   .weight-tag { font-size: .64rem; color: var(--accent-ink); background: var(--accent); padding: 2px 7px; border-radius: 2px; }
   .empty-note { font-size: var(--fs-small); color: var(--ink-faint); }
+  .input-data { border-top: 1px dashed var(--line); margin-top: 18px; padding-top: 16px; }
+  .input-data-title { font-family: var(--font-display); font-size: var(--fs-tiny); text-transform: uppercase; letter-spacing: .06em; color: var(--ink-faint); margin-bottom: 6px; }
+  .input-data-intro { font-size: var(--fs-small); color: var(--ink-dim); margin-bottom: 10px; }
+  .input-data ul { display: flex; flex-direction: column; gap: 6px; }
+  .input-data li { font-family: var(--font-data); font-size: .78rem; color: var(--ink-dim); }
+  .input-data li b { color: var(--accent); font-family: var(--font-body); font-weight: 600; }
 
   /* ---------- generic section ---------- */
   section { padding: clamp(52px, 7vw, 88px) 0; border-top: 1px solid var(--line); }
@@ -608,6 +614,12 @@
           </div>
         </div>
 
+        <div class="input-data" id="fullInputData" style="display:none;">
+          <div class="input-data-title">Input Data</div>
+          <p class="input-data-intro">The exact numbers behind the score above, so you can verify it by hand:</p>
+          <ul id="fullInputDataList"></ul>
+        </div>
+
         <div class="band-legend">
           <span style="color:var(--band-low)">&#9679; Low &lt;20%</span>
           <span style="color:var(--band-limited)">&#9679; Limited &lt;45%</span>
@@ -829,6 +841,8 @@
   const fullCalcStr = document.getElementById("fullCalcStr");
   const fullFinalPct = document.getElementById("fullFinalPct");
   const fullFinalBand = document.getElementById("fullFinalBand");
+  const fullInputData = document.getElementById("fullInputData");
+  const fullInputDataList = document.getElementById("fullInputDataList");
 
   function fullRecompute() {
     const rating = Number(fiRating.value);
@@ -865,6 +879,7 @@
     if (signals.length === 0) {
       fullEmptyNote.style.display = "";
       fullFinalContent.style.display = "none";
+      fullInputData.style.display = "none";
       return;
     }
 
@@ -888,6 +903,14 @@
 
     fullEmptyNote.style.display = "none";
     fullFinalContent.style.display = "";
+
+    const inputItems = [];
+    inputItems.push("<li><b>Rating:</b> " + fmt(rating) + " (" + ctx.name + ")</li>");
+    if (rankedRes) inputItems.push("<li><b>Ranked:</b> " + fmt(rGames) + " matches, " + rWr + "% win rate &middot; cap " + fmt(ctx.cap) + "</li>");
+    if (classicRes) inputItems.push("<li><b>Classic:</b> " + fmt(cGames) + " matches, " + fmt(cAvg) + " avg score</li>");
+    if (teamRes) inputItems.push("<li><b>Team:</b> " + fmt(tGames) + " matches, " + tWr + "% win rate &middot; cap " + fmt(Math.round(teamCap)) + "</li>");
+    fullInputDataList.innerHTML = inputItems.join("");
+    fullInputData.style.display = "";
   }
 
   [fiRating, fiRankedGames, fiRankedWr, fiClassicGames, fiClassicAvg, fiTeamGames, fiTeamWr]
