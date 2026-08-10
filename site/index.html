@@ -236,6 +236,17 @@
   .final-box .fb { display: inline-block; margin-top: 8px; font-family: var(--font-display); font-size: .68rem; text-transform: uppercase; letter-spacing: .05em; padding: 4px 9px; border-radius: 2px; }
   .band-legend { display: flex; flex-wrap: wrap; gap: 4px 14px; margin-top: 12px; font-family: var(--font-display); font-size: .65rem; text-transform: uppercase; letter-spacing: .03em; color: var(--ink-faint); }
 
+  /* ---------- full "calculate your own" card ---------- */
+  .calc-card--full { max-width: 780px; }
+  .calc-card--full .calc-body { padding: 22px; }
+  .field--rating { max-width: 320px; margin-bottom: 24px; }
+  .mode-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-bottom: 4px; }
+  @media (max-width: 720px) { .mode-grid { grid-template-columns: 1fr; } }
+  .mode-col { border: 1px solid var(--line); border-radius: var(--radius); padding: 14px; }
+  .mode-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; font-family: var(--font-display); font-size: .72rem; text-transform: uppercase; letter-spacing: .05em; color: var(--ink); }
+  .weight-tag { font-size: .64rem; color: var(--accent-ink); background: var(--accent); padding: 2px 7px; border-radius: 2px; }
+  .empty-note { font-size: var(--fs-small); color: var(--ink-faint); }
+
   /* ---------- generic section ---------- */
   section { padding: clamp(52px, 7vw, 88px) 0; border-top: 1px solid var(--line); }
   .s-head { max-width: 62ch; margin-bottom: 34px; }
@@ -525,6 +536,89 @@
   </div>
 </section>
 
+<section id="calculate">
+  <div class="wrap">
+    <div class="s-head">
+      <div class="eyebrow">&sect;05 &mdash; Calculate your own score</div>
+      <h2>Plug in your real numbers.</h2>
+      <p class="lede">Open your own GeoGuessr profile, find your Ranked, Classic and Team Duels stats, and enter what you have below &mdash; leave a mode at 0 games to skip it, same as the script does for modes you haven't played. This runs the exact same aggregation live in your browser; nothing is sent anywhere.</p>
+    </div>
+
+    <div class="calc-card calc-card--full">
+      <div class="calc-head">
+        <div class="t"><span class="mark">&#128202;</span> Your Final Weighted Score</div>
+        <div class="live"><span class="dot"></span> All three signals</div>
+      </div>
+      <div class="calc-body">
+        <div class="field field--rating">
+          <div class="flabel"><span>Rating</span><b id="fvRating">0</b></div>
+          <input type="range" id="fiRating" min="0" max="2100" step="10" value="0" aria-label="Rating">
+        </div>
+
+        <div class="mode-grid">
+          <div class="mode-col">
+            <div class="mode-head"><span>Ranked Duels</span><span class="weight-tag">50%</span></div>
+            <div class="field">
+              <div class="flabel"><span>Games played</span><b id="fvRankedGames">0</b></div>
+              <input type="range" id="fiRankedGames" min="0" max="1000" step="1" value="0" aria-label="Ranked Duels games played, log scale">
+            </div>
+            <div class="field">
+              <div class="flabel"><span>Win rate</span><b id="fvRankedWr">0%</b></div>
+              <input type="range" id="fiRankedWr" min="0" max="100" step="1" value="0" aria-label="Ranked Duels win rate percent">
+            </div>
+          </div>
+
+          <div class="mode-col">
+            <div class="mode-head"><span>Classic</span><span class="weight-tag">30%</span></div>
+            <div class="field">
+              <div class="flabel"><span>Games played</span><b id="fvClassicGames">0</b></div>
+              <input type="range" id="fiClassicGames" min="0" max="1000" step="1" value="0" aria-label="Classic games played, log scale">
+            </div>
+            <div class="field">
+              <div class="flabel"><span>Avg. score</span><b id="fvClassicAvg">0</b></div>
+              <input type="range" id="fiClassicAvg" min="0" max="25000" step="50" value="0" aria-label="Classic average score, out of 25000">
+            </div>
+          </div>
+
+          <div class="mode-col">
+            <div class="mode-head"><span>Team Duels</span><span class="weight-tag">20%</span></div>
+            <div class="field">
+              <div class="flabel"><span>Games played</span><b id="fvTeamGames">0</b></div>
+              <input type="range" id="fiTeamGames" min="0" max="1000" step="1" value="0" aria-label="Team Duels games played, log scale">
+            </div>
+            <div class="field">
+              <div class="flabel"><span>Win rate</span><b id="fvTeamWr">0%</b></div>
+              <input type="range" id="fiTeamWr" min="0" max="100" step="1" value="0" aria-label="Team Duels win rate percent">
+            </div>
+          </div>
+        </div>
+
+        <div class="readout" id="fullReadout"></div>
+
+        <div class="final-box" id="fullFinalBox">
+          <div class="fl">Final Weighted Score</div>
+          <div class="empty-note" id="fullEmptyNote">Move at least one mode's games slider above 0 to see your score.</div>
+          <div id="fullFinalContent" style="display:none;">
+            <div class="rrow">
+              <span class="rl">Calculation</span>
+              <span class="rv" id="fullCalcStr" style="color:var(--accent); background:transparent;"></span>
+            </div>
+            <div class="fv" id="fullFinalPct" style="margin-top:10px;">&mdash;</div>
+            <span class="fb" id="fullFinalBand"></span>
+          </div>
+        </div>
+
+        <div class="band-legend">
+          <span style="color:var(--band-low)">&#9679; Low &lt;20%</span>
+          <span style="color:var(--band-limited)">&#9679; Limited &lt;45%</span>
+          <span style="color:var(--band-high)">&#9679; High &lt;70%</span>
+          <span style="color:var(--band-veryhigh)">&#9679; Very High &ge;70%</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <footer>
   <div class="wrap">
     <div class="fnote">MIT License &middot; v6.5.0 &middot; calibrated against magnusgeo.magnusmagi.com/median</div>
@@ -575,6 +669,43 @@
     if (pct < 45) return { label: "Limited", css: "var(--band-limited)" };
     if (pct < 70) return { label: "High", css: "var(--band-high)" };
     return { label: "Very High", css: "var(--band-veryhigh)" };
+  }
+
+  /* Shared by the "Calculate your own score" widget: one win-rate-based mode
+     (Ranked or Team) and the Classic mode, each mirroring the real script's
+     rankAnomalySignalDetailed()/classicSignalDetailed() exactly. */
+  function computeWinRateMode(prefix, games, wr, rating, cap) {
+    if (!(games > 0)) return null;
+    const stab = stabilizedWinRate(games, wr);
+    const base = winRateSignal(stab);
+    let smurf = 0;
+    const eligible = rating >= 600 && games < cap;
+    if (eligible) {
+      const deficit = clamp((cap - games) / cap);
+      smurf = deficit * clamp(wr / 100);
+    }
+    const value = clamp(Math.max(base, smurf));
+    const smurfRow = eligible
+      ? row(prefix + " smurf boost", "(" + fmt(cap) + " \u2212 " + games + ") / " + fmt(cap) + " \u00D7 " + wr + "% = " + (smurf * 100).toFixed(1) + "%")
+      : row(prefix + " smurf boost", "not applied (" + (rating < 600 ? "rank below Gold" : "matches >= cap") + ")", true);
+    const rows =
+      row(prefix + " win rate", "(" + games + "\u00D7" + wr + "% + 50\u00D750%) / " + (games + 50) + " = " + (stab * 100).toFixed(1) + "%") +
+      row(prefix + " risk curve", "curve(" + (stab * 100).toFixed(1) + "%) = " + (base * 100).toFixed(1) + "%") +
+      smurfRow;
+    return { value: value, rows: rows };
+  }
+
+  function computeClassicMode(games, avgScore) {
+    if (!(games > 0)) return null;
+    let scoreSignal = 0;
+    if (avgScore > 20000) scoreSignal = 0.6 + ((avgScore - 20000) / 5000) * 0.4;
+    else if (avgScore > 18000) scoreSignal = ((avgScore - 18000) / 2000) * 0.6;
+    const evidence = clamp(Math.sqrt(games / 1500));
+    const value = clamp(scoreSignal * evidence);
+    const rows =
+      row("Classic score anomaly", "based on avg " + fmt(avgScore) + " = " + (scoreSignal * 100).toFixed(1) + "%") +
+      row("Classic confidence", "\u221A(" + games + " / 1500) = " + evidence.toFixed(2));
+    return { value: value, rows: rows };
   }
 
   const iRating = document.getElementById("iRating");
@@ -674,6 +805,95 @@
   });
 
   recompute();
+
+  /* ---- "Calculate your own score" widget (bottom of page) ---- */
+  const fiRating = document.getElementById("fiRating");
+  const fiRankedGames = document.getElementById("fiRankedGames");
+  const fiRankedWr = document.getElementById("fiRankedWr");
+  const fiClassicGames = document.getElementById("fiClassicGames");
+  const fiClassicAvg = document.getElementById("fiClassicAvg");
+  const fiTeamGames = document.getElementById("fiTeamGames");
+  const fiTeamWr = document.getElementById("fiTeamWr");
+
+  const fvRating = document.getElementById("fvRating");
+  const fvRankedGames = document.getElementById("fvRankedGames");
+  const fvRankedWr = document.getElementById("fvRankedWr");
+  const fvClassicGames = document.getElementById("fvClassicGames");
+  const fvClassicAvg = document.getElementById("fvClassicAvg");
+  const fvTeamGames = document.getElementById("fvTeamGames");
+  const fvTeamWr = document.getElementById("fvTeamWr");
+
+  const fullReadout = document.getElementById("fullReadout");
+  const fullEmptyNote = document.getElementById("fullEmptyNote");
+  const fullFinalContent = document.getElementById("fullFinalContent");
+  const fullCalcStr = document.getElementById("fullCalcStr");
+  const fullFinalPct = document.getElementById("fullFinalPct");
+  const fullFinalBand = document.getElementById("fullFinalBand");
+
+  function fullRecompute() {
+    const rating = Number(fiRating.value);
+    fvRating.textContent = fmt(rating);
+    const ctx = getRankContext(rating);
+
+    const rGames = positionToGames(Number(fiRankedGames.value));
+    const rWr = Number(fiRankedWr.value);
+    fvRankedGames.textContent = fmt(rGames);
+    fvRankedWr.textContent = rWr + "%";
+
+    const cGames = positionToGames(Number(fiClassicGames.value));
+    const cAvg = Number(fiClassicAvg.value);
+    fvClassicGames.textContent = fmt(cGames);
+    fvClassicAvg.textContent = fmt(cAvg);
+
+    const tGames = positionToGames(Number(fiTeamGames.value));
+    const tWr = Number(fiTeamWr.value);
+    fvTeamGames.textContent = fmt(tGames);
+    fvTeamWr.textContent = tWr + "%";
+
+    const teamCap = ctx.cap * 0.7;
+    const rankedRes = computeWinRateMode("Ranked", rGames, rWr, rating, ctx.cap);
+    const classicRes = computeClassicMode(cGames, cAvg);
+    const teamRes = computeWinRateMode("Team", tGames, tWr, rating, teamCap);
+
+    let rowsHtml = row("Division", "<span style=\"color:var(--accent)\">" + ctx.name + "</span> &middot; ranked cap " + fmt(ctx.cap) + " &middot; team cap " + fmt(Math.round(teamCap)));
+    const signals = [];
+    if (rankedRes) { rowsHtml += rankedRes.rows; signals.push({ value: rankedRes.value, weight: 0.5 }); }
+    if (classicRes) { rowsHtml += classicRes.rows; signals.push({ value: classicRes.value, weight: 0.3 }); }
+    if (teamRes) { rowsHtml += teamRes.rows; signals.push({ value: teamRes.value, weight: 0.2 }); }
+    fullReadout.innerHTML = rowsHtml;
+
+    if (signals.length === 0) {
+      fullEmptyNote.style.display = "";
+      fullFinalContent.style.display = "none";
+      return;
+    }
+
+    const totalWeight = signals.reduce(function (sum, s) { return sum + s.weight; }, 0);
+    const normalized = signals.reduce(function (sum, s) { return sum + s.value * s.weight; }, 0) / totalWeight;
+    const score = Math.round(clamp(normalized * 100, 0, 100) * 10) / 10;
+
+    const calcParts = [];
+    if (rankedRes) calcParts.push("(" + (rankedRes.value * 100).toFixed(1) + "% \u00D7 " + Math.round((0.5 / totalWeight) * 100) + "%)");
+    if (classicRes) calcParts.push("(" + (classicRes.value * 100).toFixed(1) + "% \u00D7 " + Math.round((0.3 / totalWeight) * 100) + "%)");
+    if (teamRes) calcParts.push("(" + (teamRes.value * 100).toFixed(1) + "% \u00D7 " + Math.round((0.2 / totalWeight) * 100) + "%)");
+    fullCalcStr.textContent = calcParts.join(" + ");
+
+    const band = scoreBand(score);
+    fullFinalPct.textContent = score.toFixed(1) + "%";
+    fullFinalPct.style.color = band.css;
+    fullFinalBand.textContent = band.label + " signal";
+    fullFinalBand.style.background = "color-mix(in srgb, " + band.css + " 18%, transparent)";
+    fullFinalBand.style.color = band.css;
+    fullFinalBand.style.border = "1px solid " + band.css;
+
+    fullEmptyNote.style.display = "none";
+    fullFinalContent.style.display = "";
+  }
+
+  [fiRating, fiRankedGames, fiRankedWr, fiClassicGames, fiClassicAvg, fiTeamGames, fiTeamWr]
+    .forEach(function (el) { el.addEventListener("input", fullRecompute); });
+
+  fullRecompute();
 
   /* ---- risk curve chart ---- */
   function drawCurve() {
